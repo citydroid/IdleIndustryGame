@@ -10,20 +10,24 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e9620f8c34305754d8cc9a7e49e852d9, type: 3}
-  m_Name: Buttons_Name_ru-RU
+  m_Name: UpgradeButCondition_en
   m_EditorClassIdentifier: 
   m_LocaleId:
-    m_Code: ru-RU
-  m_SharedData: {fileID: 11400000, guid: e94e0a54d67b2084e9b769ffbf5241a6, type: 2}
+    m_Code: en
+  m_SharedData: {fileID: 11400000, guid: d05d58a8569e34741ae43a68813f9ad7, type: 2}
   m_Metadata:
     m_Items: []
   m_TableData:
-  - m_Id: 125644242944
-    m_Localized: "\u0417\u0410\u0412\u041E\u0414"
+  - m_Id: 8128544768
+    m_Localized: Factory 5
     m_Metadata:
       m_Items: []
-  - m_Id: 180333772800
-    m_Localized: "\u0422\u0420\u0410\u041D\u0421\u041F\u041E\u0420\u0422"
+  - m_Id: 200357691392
+    m_Localized: Upgrade Factory 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 212571504640
+    m_Localized: Upgrade Factory 2
     m_Metadata:
       m_Items: []
   references:

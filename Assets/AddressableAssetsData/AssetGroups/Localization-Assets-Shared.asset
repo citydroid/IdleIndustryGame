@@ -21,6 +21,14 @@ MonoBehaviour:
     m_Address: Assets/Resources/Buttons_Name Shared Data.asset
     m_ReadOnly: 1
     m_SerializedLabels: []
+  - m_GUID: 2889dea35ceeb75428859cd2045000fe
+    m_Address: Assets/Resources/UpgradeButtons Shared Data.asset
+    m_ReadOnly: 1
+    m_SerializedLabels: []
+  - m_GUID: d05d58a8569e34741ae43a68813f9ad7
+    m_Address: Assets/Resources/UpgradeButCondition Shared Data.asset
+    m_ReadOnly: 1
+    m_SerializedLabels: []
   m_ReadOnly: 1
   m_Settings: {fileID: 11400000, guid: 30cd0d03ad923bc468e481da1657a35e, type: 2}
   m_SchemaSet:

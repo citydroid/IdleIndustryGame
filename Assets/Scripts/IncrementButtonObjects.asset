@@ -13,7 +13,9 @@ MonoBehaviour:
   m_Name: IncrementButtonObjects
   m_EditorClassIdentifier: 
   buttonsData:
-  - buttonName:
+  - incrementValue: 1
+    incrementCoefficient: 1
+    buttonName:
       m_TableReference:
         m_TableCollectionName: GUID:e94e0a54d67b2084e9b769ffbf5241a6
       m_TableEntryReference:
@@ -22,14 +24,14 @@ MonoBehaviour:
       m_FallbackState: 0
       m_WaitForCompletion: 0
       m_LocalVariables: []
-    level: 1
-    incrementValue: 1
-    incrementCoefficient: 1
+    level: 0
     cost: 120
     costCoefficient: 30
     activeSprite: {fileID: 21300000, guid: 2b3863d2195a56c4bae6bdd894c4797d, type: 3}
     inactiveSprite: {fileID: 21300000, guid: 8c6e8bd3a1da7c8409cb15310fcbcfce, type: 3}
-  - buttonName:
+  - incrementValue: 5
+    incrementCoefficient: 5
+    buttonName:
       m_TableReference:
         m_TableCollectionName: GUID:e94e0a54d67b2084e9b769ffbf5241a6
       m_TableEntryReference:
@@ -38,9 +40,7 @@ MonoBehaviour:
       m_FallbackState: 0
       m_WaitForCompletion: 0
       m_LocalVariables: []
-    level: 1
-    incrementValue: 5
-    incrementCoefficient: 5
+    level: 0
     cost: 1200
     costCoefficient: 300
     activeSprite: {fileID: 21300000, guid: 2b3863d2195a56c4bae6bdd894c4797d, type: 3}
