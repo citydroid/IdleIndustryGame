@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
+using System.Collections;
 
 [RequireComponent(typeof(SpriteRenderer))]
 [RequireComponent(typeof(Collider2D))]
@@ -13,25 +14,39 @@ public class IncrementButton : MonoBehaviour,
     public Color hoverColor = Color.gray;
     public Color pressedColor = Color.white;
 
+    public Sprite activeSprite;
+    public Sprite inactiveSprite;
+
+    public float pressScale = 1f;
+    public float pressDuration = 0.1f;
+
     private SpriteRenderer spriteRenderer;
     private bool isPointerOver = false;
     private IncrementChanger incrementChanger;
+
+    private Vector3 originalScale;
 
     private void Awake()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
         spriteRenderer.color = normalColor;
         incrementChanger = GetComponent<IncrementChanger>();
+
+        originalScale = Vector3.one;
+        transform.localScale = originalScale;
     }
 
     public void OnPointerDown(PointerEventData eventData)
     {
         spriteRenderer.color = pressedColor;
 
-        // Вызываем метод для обработки нажатия на неактивную кнопку
-        if (incrementChanger != null)
+        // Вызов действия нажатия (например, показа инфо)
+        incrementChanger?.OnPointerDown();
+
+        // Только если кнопка активна (можно позволить покупку)
+        if (incrementChanger != null && incrementChanger.CanAffordPublic())
         {
-            incrementChanger.OnPointerDown();
+            StartCoroutine(PressEffect());
         }
     }
 
@@ -49,23 +64,24 @@ public class IncrementButton : MonoBehaviour,
     {
         isPointerOver = true;
         spriteRenderer.color = hoverColor;
-
-        // Уведомляем IncrementChanger о наведении
-        if (incrementChanger != null)
-        {
-            incrementChanger.OnPointerEnter();
-        }
+        incrementChanger?.OnPointerEnter();
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
         isPointerOver = false;
         spriteRenderer.color = normalColor;
+        incrementChanger?.OnPointerExit();
+    }
 
-        // Уведомляем IncrementChanger о выходе курсора
-        if (incrementChanger != null)
-        {
-            incrementChanger.OnPointerExit();
-        }
+    private IEnumerator PressEffect()
+    {
+        transform.localScale = originalScale * pressScale;
+        yield return new WaitForSeconds(pressDuration);
+        transform.localScale = originalScale;
+    }
+    public void ResetScale()
+    {
+        transform.localScale = originalScale;
     }
 }

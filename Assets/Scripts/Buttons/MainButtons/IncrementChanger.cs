@@ -7,6 +7,7 @@ public class IncrementChanger : MonoBehaviour
 {
     public MainScript mainScript;
     public IncrementSettings incrementSettings;
+    private IncrementButton incrementButton;
     public int buttonIndex;
 
     private SpriteRenderer spriteRenderer;
@@ -23,6 +24,7 @@ public class IncrementChanger : MonoBehaviour
     private void Awake()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
+        incrementButton = GetComponent<IncrementButton>();
 
         TextMeshPro[] texts = GetComponentsInChildren<TextMeshPro>();
         foreach (TextMeshPro text in texts)
@@ -114,7 +116,10 @@ public class IncrementChanger : MonoBehaviour
     {
         return string.Format(CultureInfo.InvariantCulture, "{0:#,##0}", cost).Replace(",", ".");
     }
-
+    public bool CanAffordPublic()
+    {
+        return CanAfford();
+    }
     private bool CanAfford()
     {
         return mainScript != null && mainScript.result != null &&
@@ -142,8 +147,18 @@ public class IncrementChanger : MonoBehaviour
 
         bool canAfford = CanAfford();
         var data = incrementSettings.GetButtonData(buttonIndex);
-        spriteRenderer.sprite = canAfford ? data.activeSprite : data.inactiveSprite;
+
+        if (incrementButton != null)
+        {
+            spriteRenderer.sprite = canAfford ? incrementButton.activeSprite : incrementButton.inactiveSprite;
+        }
+
+        if (!canAfford && incrementButton != null)
+        {
+            incrementButton.ResetScale();
+        }
     }
+
 
     private void UpdateLevelText()
     {

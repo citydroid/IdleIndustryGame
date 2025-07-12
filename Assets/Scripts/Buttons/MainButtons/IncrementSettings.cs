@@ -15,8 +15,6 @@ public class IncrementSettings : ScriptableObject
         public int level = 1; 
         public int cost;
         public int costCoefficient;
-        public Sprite activeSprite;
-        public Sprite inactiveSprite;
     }
 
     public List<ButtonData> buttonsData = new List<ButtonData>();
