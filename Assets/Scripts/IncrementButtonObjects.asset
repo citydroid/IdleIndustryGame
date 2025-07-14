@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: IncrementButtonObjects
   m_EditorClassIdentifier: 
   buttonsData:
-  - incrementValue: 17
+  - incrementValue: 1
     incrementCoefficient: 1
     buttonName:
       m_TableReference:
@@ -24,9 +24,9 @@ MonoBehaviour:
       m_FallbackState: 0
       m_WaitForCompletion: 0
       m_LocalVariables: []
-    level: 13
-    cost: 11863
-    costCoefficient: 5904
+    level: 0
+    cost: 120
+    costCoefficient: 30
   - incrementValue: 5
     incrementCoefficient: 5
     buttonName:
@@ -38,9 +38,79 @@ MonoBehaviour:
       m_FallbackState: 0
       m_WaitForCompletion: 0
       m_LocalVariables: []
-    level: 3
-    cost: 2625
-    costCoefficient: 1012
+    level: 0
+    cost: 1200
+    costCoefficient: 300
+  - incrementValue: 100
+    incrementCoefficient: 100
+    buttonName:
+      m_TableReference:
+        m_TableCollectionName: GUID:e94e0a54d67b2084e9b769ffbf5241a6
+      m_TableEntryReference:
+        m_KeyId: 1449093581000704
+        m_Key: 
+      m_FallbackState: 0
+      m_WaitForCompletion: 0
+      m_LocalVariables: []
+    level: 0
+    cost: 52000
+    costCoefficient: 1
+  - incrementValue: 500
+    incrementCoefficient: 500
+    buttonName:
+      m_TableReference:
+        m_TableCollectionName: GUID:e94e0a54d67b2084e9b769ffbf5241a6
+      m_TableEntryReference:
+        m_KeyId: 1449098576416768
+        m_Key: 
+      m_FallbackState: 0
+      m_WaitForCompletion: 0
+      m_LocalVariables: []
+    level: 0
+    cost: 515000
+    costCoefficient: 1
+  - incrementValue: 10000
+    incrementCoefficient: 10000
+    buttonName:
+      m_TableReference:
+        m_TableCollectionName: GUID:e94e0a54d67b2084e9b769ffbf5241a6
+      m_TableEntryReference:
+        m_KeyId: 1449104486191104
+        m_Key: 
+      m_FallbackState: 0
+      m_WaitForCompletion: 0
+      m_LocalVariables: []
+    level: 0
+    cost: 10200000
+    costCoefficient: 1
+  - incrementValue: 100000
+    incrementCoefficient: 100000
+    buttonName:
+      m_TableReference:
+        m_TableCollectionName: GUID:e94e0a54d67b2084e9b769ffbf5241a6
+      m_TableEntryReference:
+        m_KeyId: 1449277891301376
+        m_Key: 
+      m_FallbackState: 0
+      m_WaitForCompletion: 0
+      m_LocalVariables: []
+    level: 0
+    cost: 202000000
+    costCoefficient: 1
+  - incrementValue: 1000000
+    incrementCoefficient: 1000000
+    buttonName:
+      m_TableReference:
+        m_TableCollectionName: GUID:e94e0a54d67b2084e9b769ffbf5241a6
+      m_TableEntryReference:
+        m_KeyId: 1449296681783296
+        m_Key: 
+      m_FallbackState: 0
+      m_WaitForCompletion: 0
+      m_LocalVariables: []
+    level: 0
+    cost: 1020000000
+    costCoefficient: 1
   references:
     version: 2
     RefIds: []

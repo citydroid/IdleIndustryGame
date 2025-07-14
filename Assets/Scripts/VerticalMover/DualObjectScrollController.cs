@@ -10,7 +10,7 @@ public class DualObjectScrollController : MonoBehaviour
 
     [Header("Ограничения уровней")]
     public int minLevel = 0;
-    public int maxLevel = 10;
+    public int maxLevel = 2;
 
     [Header("Спрайты")]
     public Sprite activeUpSprite;

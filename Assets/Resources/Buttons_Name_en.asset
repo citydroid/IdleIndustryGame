@@ -23,7 +23,27 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 180333772800
-    m_Localized: LORRY
+    m_Localized: EFFECT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1449093581000704
+    m_Localized: CONSTRUCT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1449098576416768
+    m_Localized: TRANSPORT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1449104486191104
+    m_Localized: LEVEL
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1449277891301376
+    m_Localized: VEHICLE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1449296681783296
+    m_Localized: SPEED
     m_Metadata:
       m_Items: []
   references:
