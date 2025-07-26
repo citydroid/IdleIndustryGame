@@ -138,7 +138,7 @@ public class IncrementChanger : MonoBehaviour
     {
         if (incrementSettings == null) return;
         var data = incrementSettings.GetButtonData(buttonIndex);
-        currentCost = data.cost;
+        currentCost = data.cost + data.costCoefficient;
     }
 
     private void UpdateButtonState()

@@ -25,8 +25,8 @@ MonoBehaviour:
       m_WaitForCompletion: 0
       m_LocalVariables: []
     level: 0
-    cost: 120
-    costCoefficient: 30
+    cost: 100
+    costCoefficient: 20
   - incrementValue: 5
     incrementCoefficient: 5
     buttonName:
@@ -39,8 +39,8 @@ MonoBehaviour:
       m_WaitForCompletion: 0
       m_LocalVariables: []
     level: 0
-    cost: 1200
-    costCoefficient: 300
+    cost: 1000
+    costCoefficient: 200
   - incrementValue: 100
     incrementCoefficient: 100
     buttonName:
@@ -53,8 +53,8 @@ MonoBehaviour:
       m_WaitForCompletion: 0
       m_LocalVariables: []
     level: 0
-    cost: 52000
-    costCoefficient: 1
+    cost: 50000
+    costCoefficient: 2000
   - incrementValue: 500
     incrementCoefficient: 500
     buttonName:
@@ -67,8 +67,8 @@ MonoBehaviour:
       m_WaitForCompletion: 0
       m_LocalVariables: []
     level: 0
-    cost: 515000
-    costCoefficient: 1
+    cost: 495000
+    costCoefficient: 20000
   - incrementValue: 10000
     incrementCoefficient: 10000
     buttonName:
@@ -81,8 +81,8 @@ MonoBehaviour:
       m_WaitForCompletion: 0
       m_LocalVariables: []
     level: 0
-    cost: 10200000
-    costCoefficient: 1
+    cost: 10000000
+    costCoefficient: 200000
   - incrementValue: 100000
     incrementCoefficient: 100000
     buttonName:
@@ -95,8 +95,8 @@ MonoBehaviour:
       m_WaitForCompletion: 0
       m_LocalVariables: []
     level: 0
-    cost: 202000000
-    costCoefficient: 1
+    cost: 200000000
+    costCoefficient: 2000000
   - incrementValue: 1000000
     incrementCoefficient: 1000000
     buttonName:
@@ -109,8 +109,8 @@ MonoBehaviour:
       m_WaitForCompletion: 0
       m_LocalVariables: []
     level: 0
-    cost: 1020000000
-    costCoefficient: 1
+    cost: 1000000000
+    costCoefficient: 20000000
   references:
     version: 2
     RefIds: []

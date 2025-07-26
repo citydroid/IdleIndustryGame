@@ -14,7 +14,7 @@ public class Result
     public Result(MainScript mainScript)
     {
         _mainScript = mainScript;
-        _totalValue = 10000;
+        _totalValue = 100;
         _mainScript.StartCoroutine(AddIncrementCoroutine());
     }
 
