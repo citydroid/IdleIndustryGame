@@ -8,7 +8,6 @@ public class IncrementSettings : ScriptableObject
     [System.Serializable]
     public class ButtonData
     {
-
         public int incrementValue;
         public int incrementCoefficient;
         public LocalizedString buttonName; 

@@ -4,7 +4,7 @@ using TMPro;
 
 [RequireComponent(typeof(Collider2D))]
 [RequireComponent(typeof(AudioSource))] // Для звука клика
-public class ClickToAddMoney : MonoBehaviour
+public class ClickToAddMoneyPlant : MonoBehaviour
 {
     [Header("Main Settings")]
     [SerializeField] private MainScript mainScript;
@@ -56,7 +56,7 @@ public class ClickToAddMoney : MonoBehaviour
             ShowFloatingText();
             PlayClickParticles();
 
-            // Звуковой эффект
+            // Звук
             PlayClickSound();
 
             // Анимация
@@ -69,41 +69,14 @@ public class ClickToAddMoney : MonoBehaviour
         if (floatingTextPrefab != null)
         {
             Vector3 spawnPosition = transform.position + (Vector3)textOffset;
-            GameObject textObj = Instantiate(floatingTextPrefab, spawnPosition, Quaternion.identity);
-            TextMeshPro textMesh = textObj.GetComponent<TextMeshPro>();
+            GameObject instance = Instantiate(floatingTextPrefab, spawnPosition, Quaternion.identity);
 
-            if (textMesh != null)
+            var floatingText = instance.GetComponent<FloatingText>();
+            if (floatingText != null)
             {
-                textMesh.text = $"+{clickReward}";
-                textMesh.color = textColor;
+                floatingText.Initialize(clickReward, textColor, textLifetime, textFloatSpeed);
             }
-
-            StartCoroutine(FloatAndDestroy(textObj));
         }
-    }
-
-    private IEnumerator FloatAndDestroy(GameObject textObj)
-    {
-        float timer = 0f;
-        Vector3 startPosition = textObj.transform.position;
-
-        while (timer < textLifetime)
-        {
-            textObj.transform.position = startPosition + new Vector3(0, textFloatSpeed * timer, 0);
-            timer += Time.deltaTime;
-
-            // Плавное исчезновение
-            if (textObj.TryGetComponent<TextMeshPro>(out var text))
-            {
-                Color color = text.color;
-                color.a = 1f - (timer / textLifetime);
-                text.color = color;
-            }
-
-            yield return null;
-        }
-
-        Destroy(textObj);
     }
 
     private void PlayClickSound()
@@ -126,13 +99,12 @@ public class ClickToAddMoney : MonoBehaviour
     {
         _isAnimating = true;
 
-        // Уменьшаем объект
+        // Уменьшение объекта
         transform.localScale = _originalScale * clickScaleFactor;
 
-        // Ждем указанное время
         yield return new WaitForSeconds(animationDuration);
 
-        // Возвращаем исходный размер
+        // Возврат к исходному масштабу
         transform.localScale = _originalScale;
 
         _isAnimating = false;
