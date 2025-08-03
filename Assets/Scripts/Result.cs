@@ -4,17 +4,21 @@ public class Result
 {
     private MainScript _mainScript;
     private int _totalValue;
-
+    public SaveSystem _saveSystem;
     public int TotalValue
     {
         get => _totalValue;
-        set => _totalValue = Mathf.Max(0, value); // не даём быть меньше 0
+        set
+        {
+            _totalValue = Mathf.Max(0, value);
+            _saveSystem?.SaveGame();
+        }
     }
 
-    public Result(MainScript mainScript)
+    public Result(MainScript mainScript, int startValue)
     {
         _mainScript = mainScript;
-        _totalValue = 100;
+        _totalValue = startValue;
         _mainScript.StartCoroutine(AddIncrementCoroutine());
     }
 
@@ -22,7 +26,7 @@ public class Result
     {
         while (true)
         {
-            _totalValue += _mainScript.increment.Value;
+            TotalValue += _mainScript.increment.Value;
             yield return new WaitForSeconds(0.1f);
         }
     }

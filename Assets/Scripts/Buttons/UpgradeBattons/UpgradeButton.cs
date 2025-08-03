@@ -1,4 +1,4 @@
-using UnityEngine;
+п»їusing UnityEngine;
 using UnityEngine.Localization;
 using System.Globalization;
 
@@ -12,23 +12,27 @@ public class UpgradeButton : MonoBehaviour
     public class ButtonData
     {
         public int incrementValue;
-        public int targetButtonIndex;
     }
 
     [Header("Main Settings")]
     [SerializeField] private MainScript mainScript;
-    [SerializeField] private IncrementSettings incrementSettings;
+    private SaveSystem _saveSystem;
 
     [Header("Upgrade Settings")]
     [SerializeField] private ButtonData buttonData;
     [SerializeField] private int cost;
+    [SerializeField] private IncrementChanger targetChanger;
 
     [Header("Unlock Settings")]
     [SerializeField] private UnlockConditionType unlockCondition = UnlockConditionType.CostCheck;
-    [SerializeField] private int checkButtonIndex;
+    [SerializeField] private IncrementChanger changerToCheck;
     [SerializeField] private int targetCostToUnlock;
     [SerializeField] public bool requireOtherButtonActivation = false;
     [SerializeField] public UpgradeButton requiredButton;
+
+    [Header("Visibility Control")]
+    [SerializeField] private VisibilityController visibilityController;
+    [SerializeField] private int objectIndexToActivate = 0;
 
     [Header("Localization")]
     [SerializeField] private LocalizedString buttonName;
@@ -40,7 +44,25 @@ public class UpgradeButton : MonoBehaviour
     private bool conditionsMet;
 
     public bool IsUnlocked => conditionsMet;
-    public bool IsAffordable => mainScript != null && mainScript.result.TotalValue >= cost;
+    public bool IsAffordable
+    {
+        get
+        {
+            // РћСЃРЅРѕРІРЅРѕР№ СЃРїРѕСЃРѕР± С‡РµСЂРµР· MainScript
+            if (mainScript != null && mainScript.result != null)
+                return mainScript.result.TotalValue >= cost;
+
+            // Р РµР·РµСЂРІРЅС‹Р№ СЃРїРѕСЃРѕР± С‡РµСЂРµР· SaveSystem
+            if (_saveSystem == null)
+                _saveSystem = FindObjectOfType<SaveSystem>();
+
+            if (_saveSystem != null)
+                return _saveSystem.GetSavedTotalValue() >= cost;
+
+            // РђРІР°СЂРёР№РЅС‹Р№ РІР°СЂРёР°РЅС‚
+            return new SaveData().totalValue >= cost;
+        }
+    }
     public bool CanPurchase => IsAffordable && conditionsMet && !purchased;
 
     public MainScript Main => mainScript;
@@ -49,52 +71,57 @@ public class UpgradeButton : MonoBehaviour
 
     private void Awake()
     {
-        if (buttonData == null)
+        if (buttonData == null || targetChanger == null)
         {
-            Debug.LogError("ButtonData is not assigned!");
+            Debug.LogError("UpgradeButton: buttonData РёР»Рё targetChanger РЅРµ РЅР°Р·РЅР°С‡РµРЅ!");
             enabled = false;
         }
     }
 
     private void Start()
     {
+        InitializeReferences();
+        CheckUnlockConditions();
+    }
+
+    private void InitializeReferences()
+    {
         if (mainScript == null)
             mainScript = FindObjectOfType<MainScript>();
 
-        if (incrementSettings == null)
-            incrementSettings = FindObjectOfType<IncrementSettings>();
-
-        CheckUnlockConditions();
+        if (_saveSystem == null)
+            _saveSystem = FindObjectOfType<SaveSystem>();
     }
 
     private void Update()
     {
         if (!purchased)
-        {
             CheckUnlockConditions();
-        }
     }
 
     public void TryPurchase()
     {
-        if (!CanPurchase || buttonData == null)
+        if (!CanPurchase)
             return;
 
-        mainScript.result.TotalValue -= cost;
-
-        var targetData = incrementSettings.GetButtonData(buttonData.targetButtonIndex);
-        if (targetData != null)
+        // Р‘РµР·РѕРїР°СЃРЅРѕРµ СЃРїРёСЃР°РЅРёРµ СЃСЂРµРґСЃС‚РІ
+        if (mainScript != null && mainScript.result != null)
         {
-            targetData.incrementValue += buttonData.incrementValue;
-
-            foreach (var changer in FindObjectsOfType<IncrementChanger>())
-            {
-                if (changer.buttonIndex == buttonData.targetButtonIndex)
-                {
-                    changer.ForceUpdateTexts();
-                }
-            }
+            mainScript.result.TotalValue -= cost;
         }
+        else if (_saveSystem != null)
+        {
+            int newValue = _saveSystem.GetSavedTotalValue() - cost;
+            _saveSystem.Result.TotalValue = newValue;
+            _saveSystem.SaveGame();
+        }
+
+        // РџСЂРёРјРµРЅСЏРµРј СѓР»СѓС‡С€РµРЅРёРµ
+        targetChanger?.AddIncrementValue(buttonData.incrementValue);
+        targetChanger?.ForceUpdateTexts();
+
+        // РЈРїСЂР°РІР»РµРЅРёРµ РІРёРґРёРјРѕСЃС‚СЊСЋ
+        visibilityController?.ShowObject(objectIndexToActivate);
 
         purchased = true;
     }
@@ -122,8 +149,7 @@ public class UpgradeButton : MonoBehaviour
 
     private bool CheckCostCondition()
     {
-        var incrementData = incrementSettings.GetButtonData(checkButtonIndex);
-        return incrementData != null && incrementData.cost >= targetCostToUnlock;
+        return changerToCheck != null && changerToCheck.GetCurrentCost() >= targetCostToUnlock;
     }
 
     public void SetExternalTrigger()
@@ -135,37 +161,32 @@ public class UpgradeButton : MonoBehaviour
     public string GetUnlockConditionText()
     {
         if (purchased)
-            return "Уже куплено";
+            return "РЈР¶Рµ РєСѓРїР»РµРЅРѕ";
 
-        // Если есть кастомный текст, используем его
         if (!string.IsNullOrEmpty(conditionText.GetLocalizedString()))
             return conditionText.GetLocalizedString();
 
-        // Проверяем требование другой кнопки
         if (requireOtherButtonActivation && requiredButton != null && !requiredButton.purchased)
-            return $"Требуется: {requiredButton.GetLocalizedButtonName()}";
+            return $"РўСЂРµР±СѓРµС‚СЃСЏ: {requiredButton.GetLocalizedButtonName()}";
 
-        // Для первой кнопки (без требований)
         if (!requireOtherButtonActivation && requiredButton == null &&
             unlockCondition != UnlockConditionType.ExternalTrigger)
-            return "Доступно для покупки";
+            return "Р”РѕСЃС‚СѓРїРЅРѕ РґР»СЏ РїРѕРєСѓРїРєРё";
 
-        // Остальные случаи
         switch (unlockCondition)
         {
             case UnlockConditionType.CostCheck:
-                var incrementData = incrementSettings.GetButtonData(checkButtonIndex);
-                int currentCost = incrementData?.cost ?? 0;
-                return $"Требуется: кнопка {checkButtonIndex} (${targetCostToUnlock}) [{currentCost}/{targetCostToUnlock}]";
+                int currentCost = changerToCheck?.GetCurrentCost() ?? 0;
+                return $"РўСЂРµР±СѓРµС‚СЃСЏ: СЃС‚РѕРёРјРѕСЃС‚СЊ в‰Ґ {targetCostToUnlock} [{currentCost}/{targetCostToUnlock}]";
 
             case UnlockConditionType.ExternalTrigger:
-                return "Требуется внешнее событие";
+                return "РўСЂРµР±СѓРµС‚СЃСЏ РІРЅРµС€РЅРµРµ СЃРѕР±С‹С‚РёРµ";
 
             case UnlockConditionType.Hybrid:
-                return $"Требуется: внешнее событие + кнопка {checkButtonIndex} (${targetCostToUnlock})";
+                return $"РўСЂРµР±СѓРµС‚СЃСЏ: РІРЅРµС€РЅРµРµ СЃРѕР±С‹С‚РёРµ + СЃС‚РѕРёРјРѕСЃС‚СЊ в‰Ґ {targetCostToUnlock}";
 
             default:
-                return "Доступно для покупки";
+                return "Р”РѕСЃС‚СѓРїРЅРѕ РґР»СЏ РїРѕРєСѓРїРєРё";
         }
     }
 
@@ -178,6 +199,7 @@ public class UpgradeButton : MonoBehaviour
     {
         return buttonName != null ? buttonName.GetLocalizedString() : RawButtonName;
     }
+
     public void ForceCheckConditions()
     {
         CheckUnlockConditions();

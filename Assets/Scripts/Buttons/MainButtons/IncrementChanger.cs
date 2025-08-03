@@ -6,21 +6,36 @@ using System.Globalization;
 public class IncrementChanger : MonoBehaviour
 {
     public MainScript mainScript;
-    public IncrementSettings incrementSettings;
-    private IncrementButton incrementButton;
-    public int buttonIndex;
 
+    [System.Serializable]
+    public class ButtonData
+    {
+        public int incrementValue;
+        public int incrementCoefficient;
+        public LocalizedString buttonName;
+        public int level = 1;
+        public int cost;
+        public int costCoefficient;
+    }
+
+    [Header("Button Settings")]
+    [SerializeField] private ButtonData buttonData;
+    [SerializeField] public int buttonIndex;
+
+    private IncrementButton incrementButton;
     private SpriteRenderer spriteRenderer;
     private TextMeshPro incrementText;
     private TextMeshPro costText;
     private TextMeshPro nameText;
     private TextMeshPro levelText;
+
     private int currentCost;
     private bool isPointerOver = false;
 
     public Color priceTextColor = new Color(0.67f, 0.67f, 0.67f); // #AAAAAA
     public Color priceValueColor = Color.white;
     public Color nameTextColor = Color.yellow;
+
     private void Awake()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
@@ -29,40 +44,30 @@ public class IncrementChanger : MonoBehaviour
         TextMeshPro[] texts = GetComponentsInChildren<TextMeshPro>();
         foreach (TextMeshPro text in texts)
         {
-            if (text.name.Contains("IncrementText"))
-                incrementText = text;
-            else if (text.name.Contains("CostText"))
-                costText = text;
-            else if (text.name.Contains("NameText"))
-                nameText = text;
-            else if (text.name.Contains("LevelText"))
-                levelText = text;
+            if (text.name.Contains("IncrementText")) incrementText = text;
+            else if (text.name.Contains("CostText")) costText = text;
+            else if (text.name.Contains("NameText")) nameText = text;
+            else if (text.name.Contains("LevelText")) levelText = text;
         }
 
         CalculateCurrentCost();
         UpdateTexts();
 
-        var data = incrementSettings.GetButtonData(buttonIndex);
-        data.buttonName.StringChanged += UpdateNameText;
+        if (buttonData.buttonName != null)
+            buttonData.buttonName.StringChanged += UpdateNameText;
+    }
+
+    private void OnDestroy()
+    {
+        if (buttonData.buttonName != null)
+            buttonData.buttonName.StringChanged -= UpdateNameText;
     }
 
     private void Update()
     {
         UpdateButtonState();
-
         if (isPointerOver)
-        {
             UpdateInfoText();
-        }
-    }
-
-    private void OnDestroy()
-    {
-        if (incrementSettings != null)
-        {
-            var data = incrementSettings.GetButtonData(buttonIndex);
-            data.buttonName.StringChanged -= UpdateNameText;
-        }
     }
 
     public void OnPointerEnter()
@@ -86,40 +91,35 @@ public class IncrementChanger : MonoBehaviour
     public void OnPointerDown()
     {
         if (!CanAfford())
-        {
             UpdateInfoText();
-        }
     }
 
     private void UpdateInfoText()
     {
-        if (mainScript == null || incrementSettings == null) return;
-
-        var data = incrementSettings.GetButtonData(buttonIndex);
+        if (mainScript == null) return;
 
         if (mainScript.infoTextName != null)
-            mainScript.infoTextName.text = $"<color=#{ColorUtility.ToHtmlStringRGB(nameTextColor)}>{data.buttonName.GetLocalizedString()} {data.level + 1}</color>";
+            mainScript.infoTextName.text = $"<color=#{ColorUtility.ToHtmlStringRGB(nameTextColor)}>{buttonData.buttonName.GetLocalizedString()} {buttonData.level + 1}</color>";
 
-    if (mainScript.infoTextCost != null)
-    {
-        string formattedCost = FormatCost(currentCost);
-        mainScript.infoTextCost.text = 
-            $"<color=#{ColorUtility.ToHtmlStringRGB(priceTextColor)}>Цена:</color> " +
-            $"<color=#{ColorUtility.ToHtmlStringRGB(priceValueColor)}>{formattedCost}</color>";
-    }
+        if (mainScript.infoTextCost != null)
+        {
+            string formattedCost = FormatCost(currentCost);
+            mainScript.infoTextCost.text =
+                $"<color=#{ColorUtility.ToHtmlStringRGB(priceTextColor)}>Цена:</color> " +
+                $"<color=#{ColorUtility.ToHtmlStringRGB(priceValueColor)}>{formattedCost}</color>";
+        }
 
         if (mainScript.infoTextCondition != null)
-            mainScript.infoTextCondition.text = $"+{data.incrementValue} в секунду";
+            mainScript.infoTextCondition.text = $"+{buttonData.incrementValue} в секунду";
     }
 
     private string FormatCost(int cost)
     {
         return string.Format(CultureInfo.InvariantCulture, "{0:#,##0}", cost).Replace(",", ".");
     }
-    public bool CanAffordPublic()
-    {
-        return CanAfford();
-    }
+
+    public bool CanAffordPublic() => CanAfford();
+
     private bool CanAfford()
     {
         return mainScript != null && mainScript.result != null &&
@@ -128,67 +128,42 @@ public class IncrementChanger : MonoBehaviour
 
     private void UpdateNameText(string localizedName)
     {
-        if (nameText == null || incrementSettings == null) return;
-
-        var data = incrementSettings.GetButtonData(buttonIndex);
-        nameText.text = $"{localizedName}";
+        if (nameText == null) return;
+        nameText.text = localizedName;
     }
 
     private void CalculateCurrentCost()
     {
-        if (incrementSettings == null) return;
-        var data = incrementSettings.GetButtonData(buttonIndex);
-        currentCost = data.cost + data.costCoefficient;
+        currentCost = buttonData.cost + buttonData.costCoefficient;
     }
 
     private void UpdateButtonState()
     {
-        if (incrementSettings == null || mainScript == null) return;
-
         bool canAfford = CanAfford();
-        var data = incrementSettings.GetButtonData(buttonIndex);
-
-        if (incrementButton != null)
+        if (incrementButton != null && spriteRenderer != null)
         {
             spriteRenderer.sprite = canAfford ? incrementButton.activeSprite : incrementButton.inactiveSprite;
-        }
 
-        if (!canAfford && incrementButton != null)
-        {
-            incrementButton.ResetScale();
+            if (!canAfford)
+                incrementButton.ResetScale();
         }
     }
 
-
     private void UpdateLevelText()
     {
-        if (levelText == null || incrementSettings == null) return;
-
-        var data = incrementSettings.GetButtonData(buttonIndex);
-
-        if (data.level == 0)
-        {
-            levelText.text = ">";
-        }
-        else
-        {
-            levelText.text = data.level.ToString();
-        }
+        if (levelText == null) return;
+        levelText.text = buttonData.level == 0 ? ">" : buttonData.level.ToString();
     }
 
     private void UpdateTexts()
     {
-        if (incrementSettings == null) return;
-
-        var data = incrementSettings.GetButtonData(buttonIndex);
-
         if (incrementText != null)
-            incrementText.text = "+" + data.incrementValue;
+            incrementText.text = "+" + buttonData.incrementValue;
 
         if (costText != null)
-            costText.text = FormatCost(currentCost); 
+            costText.text = FormatCost(currentCost);
 
-        data.buttonName.RefreshString();
+        buttonData.buttonName?.RefreshString();
         UpdateLevelText();
     }
 
@@ -196,6 +171,24 @@ public class IncrementChanger : MonoBehaviour
     {
         CalculateCurrentCost();
         UpdateTexts();
+    }
+    public int GetCurrentCost()
+    {
+        return currentCost;
+    }
+
+    public void AddIncrementValue(int value)
+    {
+        buttonData.incrementValue += value;
+    }
+    public int GetIncrementValue()
+    {
+        return buttonData.incrementValue;
+    }
+
+    public void SetIncrementValue(int value)
+    {
+        buttonData.incrementValue = value;
     }
 
     public void OnButtonClick()
@@ -206,22 +199,17 @@ public class IncrementChanger : MonoBehaviour
             return;
         }
 
-        var data = incrementSettings.GetButtonData(buttonIndex);
-
-        // Основная логика
         mainScript.result.TotalValue -= currentCost;
-        mainScript.increment.Value += data.incrementValue;
+        mainScript.increment.Value += buttonData.incrementValue;
 
-        // Увеличиваем стоимость
-        data.cost += data.costCoefficient;
-        data.costCoefficient = Mathf.RoundToInt((data.costCoefficient * 0.5f) + data.costCoefficient);
-
-        data.level++;
+        buttonData.cost += buttonData.costCoefficient;
+        buttonData.costCoefficient = Mathf.RoundToInt((buttonData.costCoefficient * 0.5f) + buttonData.costCoefficient);
+        buttonData.level++;
 
         UpdateLevelText();
         CalculateCurrentCost();
 
         if (costText != null)
-            costText.text = FormatCost(currentCost); 
+            costText.text = FormatCost(currentCost);
     }
 }

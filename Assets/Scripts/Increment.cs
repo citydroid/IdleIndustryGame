@@ -1,13 +1,21 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Increment
 {
-    public int Value { get; set; }
-
-    public Increment()
+    private int _value;
+    public SaveSystem _saveSystem;
+    public int Value
     {
-        Value = 0;
+        get => _value;
+        set
+        {
+            _value = value;
+            _saveSystem?.SaveGame();
+        }
+    }
+
+    public Increment(int startValue = 0)
+    {
+        Value = startValue;
     }
 }

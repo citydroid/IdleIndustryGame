@@ -1,10 +1,11 @@
+
 using UnityEngine;
 using TMPro;
 using System.Globalization;
 
 public class MainScript : MonoBehaviour
 {
-    public TextMeshPro resultText;    
+    public TextMeshPro resultText;
     public TextMeshPro incrementText;
     public TextMeshPro infoTextName;
     public TextMeshPro infoTextCost;
@@ -12,12 +13,24 @@ public class MainScript : MonoBehaviour
 
     public Increment increment;
     public Result result;
+    public SaveSystem saveSystem;
 
     private void Start()
     {
-        increment = new Increment();
-        result = new Result(this);
+        // Инициализируем SaveSystem первым
+        saveSystem = new GameObject("SaveSystem").AddComponent<SaveSystem>();
+
+        // Создаём объекты с загруженными значениями
+        increment = new Increment(saveSystem.GetSavedIncrementValue());
+        result = new Result(this, saveSystem.GetSavedTotalValue());
+
+        // Сохраняем ссылки в SaveSystem
+        saveSystem.Result = result;
+        saveSystem.Increment = increment;
+        saveSystem.InitializeBindings();
+
         InvokeRepeating(nameof(UpdateUI), 0, 0.1f);
+
     }
 
     private void UpdateUI()
@@ -29,14 +42,20 @@ public class MainScript : MonoBehaviour
 
         if (incrementText != null)
             incrementText.text = "+ " + increment.Value.ToString();
-/*
-        if (infoText != null)
-            infoText.text = "Рост: " + increment.Value.ToString();
-*/
     }
+
     private string FormatCost(int cost)
     {
-        // Форматируем число с разделителем тысяч (точкой)
         return string.Format(CultureInfo.InvariantCulture, "{0:#,##0}", cost).Replace(",", ".");
+    }
+
+    public void ForceUpdateValues()
+    {
+        if (result != null && increment != null && saveSystem != null)
+        {
+            result.TotalValue = saveSystem.GetSavedTotalValue();
+            increment.Value = saveSystem.GetSavedIncrementValue();
+            UpdateUI(); // Принудительное обновление UI
+        }
     }
 }
