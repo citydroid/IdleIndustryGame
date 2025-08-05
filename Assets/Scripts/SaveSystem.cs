@@ -1,29 +1,30 @@
-using UnityEngine;
-using System.IO;
 using System;
+using System.Collections.Generic;
+using UnityEngine;
 
 [System.Serializable]
 public class SaveData
 {
     public int totalValue = 1000000;
     public int incrementValue = 0;
+
 }
 
 public class SaveSystem : MonoBehaviour
 {
     private SaveData _saveData = new SaveData();
-    private string _savePath;
 
     public Result Result { get; set; }
     public Increment Increment { get; set; }
 
+    private const string SaveKey = "SaveData";
+
     private void Awake()
     {
-        _savePath = Path.Combine(Application.persistentDataPath, "save.json");
         LoadGame();
-
         Debug.Log($"SaveSystem initialized. Loaded values: TotalValue = {_saveData.totalValue}, Increment = {_saveData.incrementValue}");
-        Debug.Log($"Save file path: {_savePath}");
+
+        // НЕ вызываем InitializeBindings здесь — вызывай вручную после установки Result и Increment
     }
 
     public void InitializeBindings()
@@ -31,13 +32,13 @@ public class SaveSystem : MonoBehaviour
         if (Increment != null)
         {
             Increment._saveSystem = this;
-            Increment.Value = _saveData.incrementValue; // Применяем сохранённое значение
+            Increment.Value = _saveData.incrementValue;
         }
 
         if (Result != null)
         {
             Result._saveSystem = this;
-            Result.TotalValue = _saveData.totalValue; // Применяем сохранённое значение
+            Result.TotalValue = _saveData.totalValue;
         }
     }
 
@@ -49,7 +50,8 @@ public class SaveSystem : MonoBehaviour
             if (Increment != null) _saveData.incrementValue = Increment.Value;
 
             string json = JsonUtility.ToJson(_saveData);
-            File.WriteAllText(_savePath, json);
+            PlayerPrefs.SetString(SaveKey, json);
+            PlayerPrefs.Save();
         }
         catch (Exception e)
         {
@@ -61,9 +63,9 @@ public class SaveSystem : MonoBehaviour
     {
         try
         {
-            if (File.Exists(_savePath))
+            if (PlayerPrefs.HasKey(SaveKey))
             {
-                string json = File.ReadAllText(_savePath);
+                string json = PlayerPrefs.GetString(SaveKey);
                 _saveData = JsonUtility.FromJson<SaveData>(json);
             }
             else
@@ -81,11 +83,11 @@ public class SaveSystem : MonoBehaviour
 
     public void ResetGame()
     {
-        _saveData = new SaveData();
+        _saveData = new SaveData(); // сброс к начальному состоянию
         SaveGame();
 
-        if (Result != null) Result.TotalValue = 0;
-        if (Increment != null) Increment.Value = 0;
+        if (Result != null) Result.TotalValue = _saveData.totalValue;
+        if (Increment != null) Increment.Value = _saveData.incrementValue;
     }
 
     public int GetSavedTotalValue() => _saveData.totalValue;

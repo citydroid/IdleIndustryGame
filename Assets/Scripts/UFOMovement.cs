@@ -21,53 +21,45 @@ public class UFOMovement : MonoBehaviour
     private float startY;
     private bool isMovingToB = true;
 
+    private MainScript mainScript;
+
     void Start()
     {
-        // Устанавливаем начальную цель
         currentTarget = pointB.position;
         startY = transform.position.y;
 
-        // Инициализируем таймер наклона
         tiltTimer = tiltChangeInterval;
         targetTilt = 0f;
         currentTilt = 0f;
+
+        // Поиск MainScript на сцене
+        mainScript = FindObjectOfType<MainScript>();
+        if (mainScript == null)
+        {
+            Debug.LogWarning("MainScript not found in scene.");
+        }
     }
 
     void Update()
     {
-        // Перемещение между точками
         MoveBetweenPoints();
-
-        // Покачивание вверх-вниз
         ApplyWobble();
-
-        // Случайные наклоны
         HandleTilting();
     }
 
     void MoveBetweenPoints()
     {
-        // Двигаемся к текущей цели
         transform.position = Vector3.MoveTowards(transform.position, currentTarget, speed * Time.deltaTime);
 
-        // Если достигли цели, меняем цель
         if (Vector3.Distance(transform.position, currentTarget) < 0.01f)
         {
-            if (isMovingToB)
-            {
-                currentTarget = pointA.position;
-            }
-            else
-            {
-                currentTarget = pointB.position;
-            }
+            currentTarget = isMovingToB ? pointA.position : pointB.position;
             isMovingToB = !isMovingToB;
         }
     }
 
     void ApplyWobble()
     {
-        // Синусоидальное покачивание вверх-вниз
         float wobble = Mathf.Sin(Time.time * wobbleSpeed) * wobbleHeight;
         Vector3 pos = transform.position;
         pos.y = startY + wobble;
@@ -76,20 +68,25 @@ public class UFOMovement : MonoBehaviour
 
     void HandleTilting()
     {
-        // Уменьшаем таймер
         tiltTimer -= Time.deltaTime;
 
-        // Если таймер истек, выбираем новый угол наклона
         if (tiltTimer <= 0f)
         {
             tiltTimer = tiltChangeInterval;
             targetTilt = Random.Range(-maxTiltAngle, maxTiltAngle);
         }
 
-        // Плавно изменяем текущий угол к целевому
         currentTilt = Mathf.Lerp(currentTilt, targetTilt, tiltSpeed * Time.deltaTime);
-
-        // Применяем поворот вокруг оси Z (в 2D это будет выглядеть как наклон)
         transform.rotation = Quaternion.Euler(0f, 0f, currentTilt);
+    }
+
+    void OnMouseDown()
+    {
+        if (mainScript != null && mainScript.result != null)
+        {
+            mainScript.result.TotalValue *= 2;
+           // mainScript.saveSystem.SaveTotalValue(mainScript.result.TotalValue);
+            mainScript.ForceUpdateValues();
+        }
     }
 }

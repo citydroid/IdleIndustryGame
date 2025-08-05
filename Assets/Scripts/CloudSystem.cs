@@ -1,23 +1,27 @@
-using UnityEngine;
+п»їusing UnityEngine;
 using System.Collections;
 
 public class CloudSystem : MonoBehaviour
 {
     [Header("Cloud Settings")]
-    [SerializeField] private GameObject[] cloudPrefabs; // Массив префабов облаков
+    [SerializeField] private GameObject[] cloudPrefabs;
     [SerializeField] private float minSpawnInterval = 2f;
     [SerializeField] private float maxSpawnInterval = 5f;
-    [SerializeField] private float minYPosition = 2f;
+    [SerializeField] private float minYPosition = 2f; // Р»РѕРєР°Р»СЊРЅР°СЏ РІС‹СЃРѕС‚Р° РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕ РѕР±СЉРµРєС‚Р°
     [SerializeField] private float maxYPosition = 5f;
-    [SerializeField] private float spawnXPosition = 10f; // Спаун за правой границей экрана
-    [SerializeField] private float destroyXPosition = -15f; // Уничтожение за левой границей
+    [SerializeField] private float spawnXPosition = 2f;
+    [SerializeField] private float destroyXPosition = -10f;
     [SerializeField] private float minSpeed = 0.5f;
     [SerializeField] private float maxSpeed = 2f;
     [SerializeField] private float minScale = 0.8f;
     [SerializeField] private float maxScale = 1.2f;
+    [SerializeField] private Transform heightReference; // рџ”№ РќРѕРІС‹Р№ РѕР±СЉРµРєС‚-СЃСЃС‹Р»РєР° РґР»СЏ Р»РѕРєР°Р»СЊРЅРѕР№ РІС‹СЃРѕС‚С‹
 
     private void Start()
     {
+        if (heightReference == null)
+            Debug.LogWarning("Height Reference is not assigned on CloudSystem.");
+
         StartCoroutine(SpawnCloudsRoutine());
     }
 
@@ -32,42 +36,37 @@ public class CloudSystem : MonoBehaviour
 
     private void SpawnCloud()
     {
-        if (cloudPrefabs.Length == 0) return;
+        if (cloudPrefabs.Length == 0 || heightReference == null) return;
 
-        // Выбираем случайный префаб облака
         GameObject cloudPrefab = cloudPrefabs[Random.Range(0, cloudPrefabs.Length)];
 
-        // Случайная позиция по Y
-        float spawnYPosition = Random.Range(minYPosition, maxYPosition);
-        Vector3 spawnPosition = new Vector3(spawnXPosition, spawnYPosition, 0);
+        // рџ”№ РЎР»СѓС‡Р°Р№РЅР°СЏ Р»РѕРєР°Р»СЊРЅР°СЏ РІС‹СЃРѕС‚Р° РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕ heightReference
+        float localY = Random.Range(minYPosition, maxYPosition);
 
-        // Создаем облако
-        GameObject cloud = Instantiate(cloudPrefab, spawnPosition, Quaternion.identity, transform);
+        // рџ”№ РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ Р»РѕРєР°Р»СЊРЅРѕР№ РїРѕР·РёС†РёРё РІ РјРёСЂРѕРІСѓСЋ С‡РµСЂРµР· heightReference
+        Vector3 localSpawn = new Vector3(spawnXPosition, localY, 0f);
+        Vector3 worldSpawn = heightReference.TransformPoint(localSpawn);
 
-        // Устанавливаем случайные параметры
+        GameObject cloud = Instantiate(cloudPrefab, worldSpawn, Quaternion.identity, transform);
+
         float speed = Random.Range(minSpeed, maxSpeed);
         float scale = Random.Range(minScale, maxScale);
         cloud.transform.localScale = new Vector3(scale, scale, 1);
 
-        // Запускаем движение облака
         StartCoroutine(MoveCloud(cloud, speed));
     }
 
     private IEnumerator MoveCloud(GameObject cloud, float speed)
     {
         SpriteRenderer renderer = cloud.GetComponent<SpriteRenderer>();
-
-        // Плавное появление
         yield return StartCoroutine(FadeCloud(renderer, 0f, 1f, 0.5f));
 
-        // Движение облака
         while (cloud != null && cloud.transform.position.x > destroyXPosition)
         {
-            cloud.transform.Translate(Vector3.left * speed * Time.deltaTime);
+            cloud.transform.Translate(Vector3.left * speed * Time.deltaTime, Space.World);
             yield return null;
         }
 
-        // Плавное исчезновение перед уничтожением
         if (cloud != null)
         {
             yield return StartCoroutine(FadeCloud(renderer, 1f, 0f, 0.5f));
@@ -88,7 +87,6 @@ public class CloudSystem : MonoBehaviour
         renderer.color = new Color(1, 1, 1, endAlpha);
     }
 
-    // Метод для принудительного уничтожения облака (можно вызывать из других скриптов)
     public void DestroyCloud(GameObject cloud)
     {
         if (cloud != null)

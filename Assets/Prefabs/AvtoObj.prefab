@@ -10,12 +10,13 @@ GameObject:
   m_Component:
   - component: {fileID: 7723901839383775669}
   - component: {fileID: 4636523174778386562}
-  - component: {fileID: 8407053716757974161}
+  - component: {fileID: 8728545155831837954}
   - component: {fileID: 1967818673147838315}
   - component: {fileID: 7569513629879025982}
   - component: {fileID: 8395555382008453375}
   - component: {fileID: 7437727643897316106}
   - component: {fileID: 5403410136371876131}
+  - component: {fileID: 2357432008859900763}
   m_Layer: 0
   m_Name: AvtoObj
   m_TagString: Untagged
@@ -95,7 +96,7 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &8407053716757974161
+--- !u!114 &8728545155831837954
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -104,19 +105,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 7074382271166276830}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f81fe59aeaf4418429a8b57c15548b36, type: 3}
+  m_Script: {fileID: 11500000, guid: 2736cf22a7ad7d44b9e3d056d4330df4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   mainScript: {fileID: 0}
-  clickReward: 2
-  clickScaleFactor: 0.98
-  animationDuration: 0.05
+  clickScaleFactor: 0.9
+  animationDuration: 0.1
   floatingTextPrefab: {fileID: 2851882721793831143, guid: abf3fc43046473f419cd748316606b70, type: 3}
-  textOffset: {x: -0.35, y: 0.6}
+  textOffset: {x: 0, y: 1}
   textColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-  textLifetime: 0.5
-  textFloatSpeed: 2
-  clickSound: {fileID: 8300000, guid: 450c00571dcf99141b0736a11d3f8cad, type: 3}
+  textLifetime: 0.98
+  textFloatSpeed: 0.05
+  clickSound: {fileID: 0}
   soundVolume: 0.5
   clickParticles: {fileID: 0}
   particlesCount: 10
@@ -324,3 +324,14 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!210 &2357432008859900763
+SortingGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7074382271166276830}
+  m_Enabled: 1
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 5

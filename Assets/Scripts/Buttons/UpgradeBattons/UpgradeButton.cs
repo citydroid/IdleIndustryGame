@@ -30,9 +30,9 @@ public class UpgradeButton : MonoBehaviour
     [SerializeField] public bool requireOtherButtonActivation = false;
     [SerializeField] public UpgradeButton requiredButton;
 
-    [Header("Visibility Control")]
-    [SerializeField] private VisibilityController visibilityController;
-    [SerializeField] private int objectIndexToActivate = 0;
+    [Header("Action on Purchase")]
+    [SerializeField] private MonoBehaviour buttonAction; // Скрипт, реализующий IButtonAction
+    private IButtonAction _cachedAction;
 
     [Header("Localization")]
     [SerializeField] private LocalizedString buttonName;
@@ -48,18 +48,15 @@ public class UpgradeButton : MonoBehaviour
     {
         get
         {
-            // Основной способ через MainScript
             if (mainScript != null && mainScript.result != null)
                 return mainScript.result.TotalValue >= cost;
 
-            // Резервный способ через SaveSystem
             if (_saveSystem == null)
                 _saveSystem = FindObjectOfType<SaveSystem>();
 
             if (_saveSystem != null)
                 return _saveSystem.GetSavedTotalValue() >= cost;
 
-            // Аварийный вариант
             return new SaveData().totalValue >= cost;
         }
     }
@@ -75,6 +72,15 @@ public class UpgradeButton : MonoBehaviour
         {
             Debug.LogError("UpgradeButton: buttonData или targetChanger не назначен!");
             enabled = false;
+        }
+
+        if (buttonAction != null && buttonAction is IButtonAction action)
+        {
+            _cachedAction = action;
+        }
+        else if (buttonAction != null)
+        {
+            Debug.LogWarning($"{buttonAction.name} не реализует IButtonAction.");
         }
     }
 
@@ -104,7 +110,6 @@ public class UpgradeButton : MonoBehaviour
         if (!CanPurchase)
             return;
 
-        // Безопасное списание средств
         if (mainScript != null && mainScript.result != null)
         {
             mainScript.result.TotalValue -= cost;
@@ -116,12 +121,10 @@ public class UpgradeButton : MonoBehaviour
             _saveSystem.SaveGame();
         }
 
-        // Применяем улучшение
         targetChanger?.AddIncrementValue(buttonData.incrementValue);
         targetChanger?.ForceUpdateTexts();
 
-        // Управление видимостью
-        visibilityController?.ShowObject(objectIndexToActivate);
+        _cachedAction?.Execute();
 
         purchased = true;
     }

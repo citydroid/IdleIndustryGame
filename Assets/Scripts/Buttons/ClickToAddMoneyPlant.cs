@@ -8,7 +8,7 @@ public class ClickToAddMoneyPlant : MonoBehaviour
 {
     [Header("Main Settings")]
     [SerializeField] private MainScript mainScript;
-    [SerializeField] private int clickReward = 1;
+    private int clickReward = 10;
     [SerializeField] private float clickScaleFactor = 0.9f;
     [SerializeField] private float animationDuration = 0.1f;
 
@@ -93,6 +93,10 @@ public class ClickToAddMoneyPlant : MonoBehaviour
         {
             clickParticles.Emit(particlesCount);
         }
+    }
+    public void SetClickReward(int value)
+    {
+        clickReward = value;
     }
 
     private IEnumerator ClickAnimation()
