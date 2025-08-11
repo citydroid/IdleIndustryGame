@@ -1,73 +1,112 @@
-using UnityEngine;
+﻿using UnityEngine;
+using System.Collections;
 
 public class UFOMovement : MonoBehaviour
 {
+    [Header("Prefab & Points")]
+    [SerializeField] private GameObject ufoPrefab;
+    [SerializeField] private Transform pointA;
+    [SerializeField] private Transform pointB;
+    [SerializeField] private Transform ufoParent;
+
     [Header("Movement Settings")]
-    public Transform pointA;
-    public Transform pointB;
-    public float speed = 2f;
-    public float wobbleHeight = 0.2f;
-    public float wobbleSpeed = 5f;
+    [SerializeField] private float speed = 2f;
+    [SerializeField] private float wobbleHeight = 0.2f;
+    [SerializeField] private float wobbleSpeed = 5f;
+    [SerializeField] private float respawnDelay = 20f;
 
     [Header("Tilt Settings")]
-    public float maxTiltAngle = 15f;
-    public float tiltChangeInterval = 3f;
-    public float tiltSpeed = 2f;
+    [SerializeField] private float maxTiltAngle = 15f;
+    [SerializeField] private float tiltChangeInterval = 3f;
+    [SerializeField] private float tiltSpeed = 2f;
 
+    private GameObject currentUFO;
     private Vector3 currentTarget;
     private float tiltTimer;
     private float targetTilt;
     private float currentTilt;
     private float startY;
-    private bool isMovingToB = true;
-
     private MainScript mainScript;
+    private Vector3 localTarget;
 
-    void Start()
+    private void Start()
     {
-        currentTarget = pointB.position;
-        startY = transform.position.y;
+        mainScript = FindObjectOfType<MainScript>();
+        if (mainScript == null)
+            Debug.LogWarning("MainScript not found in scene.");
+
+        StartCoroutine(UFOSpawnLoop());
+    }
+
+    private IEnumerator UFOSpawnLoop()
+    {
+        while (true)
+        {
+            SpawnUFO();
+            yield return new WaitUntil(() => currentUFO == null); // Ждём, пока UFO удалят
+            yield return new WaitForSeconds(respawnDelay);        // Ждём перед новым спавном
+        }
+    }
+
+    private void SpawnUFO()
+    {
+        if (ufoParent == null)
+            ufoParent = this.transform;
+
+        Vector3 localSpawnPos = ufoParent.InverseTransformPoint(pointA.position);
+        localTarget = ufoParent.InverseTransformPoint(pointB.position);
+
+        currentUFO = Instantiate(ufoPrefab, ufoParent);
+        currentUFO.transform.localPosition = localSpawnPos;
+        currentUFO.transform.localRotation = Quaternion.identity;
 
         tiltTimer = tiltChangeInterval;
         targetTilt = 0f;
         currentTilt = 0f;
 
-        // ����� MainScript �� �����
-        mainScript = FindObjectOfType<MainScript>();
-        if (mainScript == null)
+        ClicUFO clickHandler = currentUFO.GetComponent<ClicUFO>();
+        if (clickHandler != null)
         {
-            Debug.LogWarning("MainScript not found in scene.");
+            clickHandler.Init(this, mainScript);
         }
     }
 
-    void Update()
+    private void Update()
     {
-        MoveBetweenPoints();
+        if (currentUFO == null) return;
+
+        MoveToTarget();
         ApplyWobble();
         HandleTilting();
     }
 
-    void MoveBetweenPoints()
+    private void MoveToTarget()
     {
-        transform.position = Vector3.MoveTowards(transform.position, currentTarget, speed * Time.deltaTime);
+        if (currentUFO == null) return;
 
-        if (Vector3.Distance(transform.position, currentTarget) < 0.01f)
+        currentUFO.transform.localPosition = Vector3.MoveTowards(currentUFO.transform.localPosition, localTarget, speed * Time.deltaTime);
+
+        if (Vector3.Distance(currentUFO.transform.localPosition, localTarget) < 0.01f)
         {
-            currentTarget = isMovingToB ? pointA.position : pointB.position;
-            isMovingToB = !isMovingToB;
+            Destroy(currentUFO);
+            currentUFO = null;
         }
     }
 
-    void ApplyWobble()
+    private void ApplyWobble()
     {
+        if (currentUFO == null) return;
+
         float wobble = Mathf.Sin(Time.time * wobbleSpeed) * wobbleHeight;
-        Vector3 pos = transform.position;
-        pos.y = startY + wobble;
-        transform.position = pos;
+        Vector3 pos = currentUFO.transform.localPosition;
+        pos.y = (ufoParent.InverseTransformPoint(pointA.position)).y + wobble;
+        currentUFO.transform.localPosition = pos;
     }
 
-    void HandleTilting()
+    private void HandleTilting()
     {
+        if (currentUFO == null) return;
+
         tiltTimer -= Time.deltaTime;
 
         if (tiltTimer <= 0f)
@@ -77,16 +116,16 @@ public class UFOMovement : MonoBehaviour
         }
 
         currentTilt = Mathf.Lerp(currentTilt, targetTilt, tiltSpeed * Time.deltaTime);
-        transform.rotation = Quaternion.Euler(0f, 0f, currentTilt);
+        currentUFO.transform.rotation = Quaternion.Euler(0f, 0f, currentTilt);
     }
-
-    void OnMouseDown()
+    public void DestroyUFO(GameObject ufo)
     {
-        if (mainScript != null && mainScript.result != null)
+        if (ufo != null)
         {
-            mainScript.result.TotalValue *= 2;
-           // mainScript.saveSystem.SaveTotalValue(mainScript.result.TotalValue);
-            mainScript.ForceUpdateValues();
+            Destroy(ufo);
+            if (ufo == currentUFO)
+                currentUFO = null;
         }
     }
 }
+
