@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Localization;
 using System.Globalization;
+using System.Collections.Generic;
 
 [RequireComponent(typeof(SpriteRenderer))]
 [RequireComponent(typeof(Collider2D))]
@@ -31,8 +32,8 @@ public class UpgradeButton : MonoBehaviour
     [SerializeField] public UpgradeButton requiredButton;
 
     [Header("Action on Purchase")]
-    [SerializeField] private MonoBehaviour buttonAction; // Скрипт, реализующий IButtonAction
-    private IButtonAction _cachedAction;
+    [SerializeField] private List<MonoBehaviour> buttonActions = new List<MonoBehaviour>(); // Список скриптов, реализующих IButtonAction
+    private List<IButtonAction> _cachedActions = new List<IButtonAction>();
 
     [Header("Localization")]
     [SerializeField] private LocalizedString buttonName;
@@ -74,13 +75,17 @@ public class UpgradeButton : MonoBehaviour
             enabled = false;
         }
 
-        if (buttonAction != null && buttonAction is IButtonAction action)
+        // Кэшируем все действительные IButtonAction из списка
+        foreach (var action in buttonActions)
         {
-            _cachedAction = action;
-        }
-        else if (buttonAction != null)
-        {
-            Debug.LogWarning($"{buttonAction.name} не реализует IButtonAction.");
+            if (action != null && action is IButtonAction buttonAction)
+            {
+                _cachedActions.Add(buttonAction);
+            }
+            else if (action != null)
+            {
+                Debug.LogWarning($"{action.name} не реализует IButtonAction.");
+            }
         }
     }
 
@@ -124,7 +129,11 @@ public class UpgradeButton : MonoBehaviour
         targetChanger?.AddIncrementValue(buttonData.incrementValue);
         targetChanger?.ForceUpdateTexts();
 
-        _cachedAction?.Execute();
+        // Выполняем все зарегистрированные действия
+        foreach (var action in _cachedActions)
+        {
+            action?.Execute();
+        }
 
         purchased = true;
     }
