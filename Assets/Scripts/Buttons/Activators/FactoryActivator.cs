@@ -1,20 +1,20 @@
-using UnityEngine;
+п»їusing UnityEngine;
 
 public class FactoryActivator : MonoBehaviour, IButtonAction
 {
-    [Header("Объект, который нужно включить")]
+    [Header("РћР±СЉРµРєС‚, РєРѕС‚РѕСЂС‹Р№ РЅСѓР¶РЅРѕ РІРєР»СЋС‡РёС‚СЊ")]
     [SerializeField] private GameObject objectToActivate;
 
-    [Header("Отключить других детей родителя?")]
+    [Header("РћС‚РєР»СЋС‡РёС‚СЊ РґСЂСѓРіРёС… РґРµС‚РµР№ СЂРѕРґРёС‚РµР»СЏ?")]
     [SerializeField] private bool deactivateSiblings = true;
 
     public void Execute()
     {
-        Debug.Log("FactoryActivator: Execute вызван");
+        Debug.Log("FactoryActivator: Execute РІС‹Р·РІР°РЅ");
 
         if (objectToActivate == null)
         {
-            Debug.LogWarning("FactoryActivator: objectToActivate не назначен.");
+            Debug.LogWarning("FactoryActivator: objectToActivate РЅРµ РЅР°Р·РЅР°С‡РµРЅ.");
             return;
         }
 
@@ -31,7 +31,7 @@ public class FactoryActivator : MonoBehaviour, IButtonAction
             }
             else
             {
-                Debug.LogWarning("FactoryActivator: objectToActivate не имеет родителя — пропускаем деактивацию других.");
+                Debug.LogWarning("FactoryActivator: objectToActivate РЅРµ РёРјРµРµС‚ СЂРѕРґРёС‚РµР»СЏ вЂ” РїСЂРѕРїСѓСЃРєР°РµРј РґРµР°РєС‚РёРІР°С†РёСЋ РґСЂСѓРіРёС….");
             }
         }
         else

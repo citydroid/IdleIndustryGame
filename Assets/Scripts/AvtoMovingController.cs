@@ -22,6 +22,9 @@ public class AvtoMovingController : MonoBehaviour
     private bool movingForward = true;
     private SpriteRenderer spriteRenderer;
 
+    [Header("Level Control")]
+    [SerializeField] private int numberLevel = 0; // 🔹 Максимальный разрешённый сегмент (0 = A0-B0)
+
     private void Start()
     {
         if (prefabToMove == null)
@@ -74,28 +77,39 @@ public class AvtoMovingController : MonoBehaviour
     {
         if (movingForward)
         {
-            if (currentLevel < waypointsA.Count - 1)
+            // 🚩 Мы на точке B
+            if (localTargetPos == waypointsB[currentLevel].localPosition)
             {
-                currentLevel++;
-                SetTargetLocal(waypointsA[currentLevel].localPosition, waypointsB[currentLevel].localPosition, prefabRotations[currentLevel]);
-            }
-            else
-            {
-                movingForward = false;
-                SetTargetLocal(waypointsB[currentLevel].localPosition, waypointsA[currentLevel].localPosition, prefabRotations[currentLevel]);
+                if (currentLevel >= numberLevel) // Достигли максимального разрешённого сегмента
+                {
+                    movingForward = false;
+                    SetTargetLocal(waypointsB[currentLevel].localPosition, waypointsA[currentLevel].localPosition, prefabRotations[currentLevel]);
+                    return;
+                }
+                else
+                {
+                    // Переходим на следующий сегмент
+                    currentLevel++;
+                    SetTargetLocal(waypointsA[currentLevel].localPosition, waypointsB[currentLevel].localPosition, prefabRotations[currentLevel]);
+                    return;
+                }
             }
         }
         else
         {
-            if (currentLevel > 0)
+            // 🚩 Мы на точке A
+            if (localTargetPos == waypointsA[currentLevel].localPosition)
             {
-                currentLevel--;
-                SetTargetLocal(waypointsB[currentLevel].localPosition, waypointsA[currentLevel].localPosition, prefabRotations[currentLevel]);
-            }
-            else
-            {
-                movingForward = true;
-                SetTargetLocal(waypointsA[currentLevel].localPosition, waypointsB[currentLevel].localPosition, prefabRotations[currentLevel]);
+                if (currentLevel > 0)
+                {
+                    currentLevel--;
+                    SetTargetLocal(waypointsB[currentLevel].localPosition, waypointsA[currentLevel].localPosition, prefabRotations[currentLevel]);
+                }
+                else
+                {
+                    movingForward = true;
+                    SetTargetLocal(waypointsA[currentLevel].localPosition, waypointsB[currentLevel].localPosition, prefabRotations[currentLevel]);
+                }
             }
         }
     }
@@ -109,17 +123,6 @@ public class AvtoMovingController : MonoBehaviour
 
     public void SetLevel(int newLevel)
     {
-        if (newLevel >= 0 && newLevel < waypointsA.Count)
-        {
-            currentLevel = newLevel;
-            if (movingForward)
-            {
-                SetTargetLocal(waypointsA[currentLevel].localPosition, waypointsB[currentLevel].localPosition, prefabRotations[currentLevel]);
-            }
-            else
-            {
-                SetTargetLocal(waypointsB[currentLevel].localPosition, waypointsA[currentLevel].localPosition, prefabRotations[currentLevel]);
-            }
-        }
+        numberLevel = Mathf.Clamp(newLevel, 0, waypointsA.Count - 1);
     }
 }
