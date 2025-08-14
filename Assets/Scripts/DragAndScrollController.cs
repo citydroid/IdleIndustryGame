@@ -5,10 +5,10 @@ using System.Collections.Generic;
 public class DragAndScrollController : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
     [Header("Настройки скроллинга")]
-    [SerializeField] public List<float> levelOffsets = new List<float> { 0f, 50f, 80f, 120f }; // Пример: расстояния для каждого уровня
+    [SerializeField] public List<float> levelOffsets = new List<float> { 0f, 50f, 80f, 120f };
     public float smoothTime = 0.3f;
     public float maxScrollSpeed = 1000f;
-    public float snapThreshold = 20f; // Порог для притягивания к уровню
+    public float snapThreshold = 20f;
 
     private RectTransform rectTransform;
     private Vector2 originalPosition;
@@ -31,7 +31,6 @@ public class DragAndScrollController : MonoBehaviour, IBeginDragHandler, IDragHa
     {
         if (!isDragging)
         {
-            // Автоматическое плавное перемещение
             currentOffset = Mathf.SmoothDamp(
                 currentOffset,
                 targetOffset,
@@ -39,62 +38,11 @@ public class DragAndScrollController : MonoBehaviour, IBeginDragHandler, IDragHa
                 smoothTime,
                 maxScrollSpeed
             );
-
             UpdatePosition();
         }
     }
 
-    // === Обработка перетаскивания мышью ===
-    public void OnBeginDrag(PointerEventData eventData)
-    {
-        if (eventData.button != PointerEventData.InputButton.Left) return;
-
-        isDragging = true;
-        dragStartPosition = eventData.position;
-        dragStartOffset = currentOffset;
-    }
-
-    public void OnDrag(PointerEventData eventData)
-    {
-        if (!isDragging || eventData.button != PointerEventData.InputButton.Left) return;
-
-        // Вычисляем смещение от начала перетаскивания (теперь в противоположную сторону)
-        float dragDelta = (eventData.position.y - dragStartPosition.y) / GetScaleFactor();
-        float newOffset = dragStartOffset + dragDelta; // Изменили знак на +
-
-        // Ограничиваем перемещение в допустимых пределах
-        float maxOffset = GetTotalOffsetForLevel(maxReachedLevel);
-        newOffset = Mathf.Clamp(newOffset, 0f, maxOffset);
-
-        currentOffset = newOffset;
-        UpdatePosition();
-    }
-
-    public void OnEndDrag(PointerEventData eventData)
-    {
-        if (eventData.button != PointerEventData.InputButton.Left) return;
-
-        isDragging = false;
-
-        // Определяем ближайший уровень для притягивания
-        int closestLevel = FindClosestLevel(currentOffset);
-        closestLevel = Mathf.Clamp(closestLevel, 0, maxReachedLevel);
-
-        // Притягиваем только если близко к уровню
-        if (Mathf.Abs(currentOffset - GetTotalOffsetForLevel(closestLevel)) <= snapThreshold)
-        {
-            currentLevel = closestLevel;
-            targetOffset = GetTotalOffsetForLevel(currentLevel);
-        }
-        else
-        {
-            // Оставляем на текущей позиции (но в пределах границ)
-            currentLevel = FindCurrentLevel(currentOffset);
-            targetOffset = Mathf.Clamp(currentOffset, 0f, GetTotalOffsetForLevel(maxReachedLevel));
-        }
-    }
-
-    // === Управление уровнями ===
+    // ==== Публичные методы для управления уровнем ====
     public void GoToNextLevel()
     {
         if (currentLevel + 1 < levelOffsets.Count)
@@ -121,16 +69,60 @@ public class DragAndScrollController : MonoBehaviour, IBeginDragHandler, IDragHa
         }
     }
 
-    // === Вспомогательные методы ===
+    public int GetCurrentLevel() => currentLevel;
+    public int GetMaxReachedLevel() => maxReachedLevel;
+
+    // === Drag events ===
+    public void OnBeginDrag(PointerEventData eventData)
+    {
+        if (eventData.button != PointerEventData.InputButton.Left) return;
+        isDragging = true;
+        dragStartPosition = eventData.position;
+        dragStartOffset = currentOffset;
+    }
+
+    public void OnDrag(PointerEventData eventData)
+    {
+        if (!isDragging || eventData.button != PointerEventData.InputButton.Left) return;
+
+        float dragDelta = (eventData.position.y - dragStartPosition.y) / GetScaleFactor();
+        float newOffset = dragStartOffset + dragDelta;
+
+        float maxOffset = GetTotalOffsetForLevel(maxReachedLevel);
+        newOffset = Mathf.Clamp(newOffset, 0f, maxOffset);
+
+        currentOffset = newOffset;
+        UpdatePosition();
+    }
+
+    public void OnEndDrag(PointerEventData eventData)
+    {
+        if (eventData.button != PointerEventData.InputButton.Left) return;
+        isDragging = false;
+
+        int closestLevel = FindClosestLevel(currentOffset);
+        closestLevel = Mathf.Clamp(closestLevel, 0, maxReachedLevel);
+
+        if (Mathf.Abs(currentOffset - GetTotalOffsetForLevel(closestLevel)) <= snapThreshold)
+        {
+            currentLevel = closestLevel;
+            targetOffset = GetTotalOffsetForLevel(currentLevel);
+        }
+        else
+        {
+            currentLevel = FindCurrentLevel(currentOffset);
+            targetOffset = Mathf.Clamp(currentOffset, 0f, GetTotalOffsetForLevel(maxReachedLevel));
+        }
+    }
+
+    // === Helpers ===
     private void UpdatePosition()
     {
-        // Изменили направление движения на противоположное (теперь + вместо -)
         rectTransform.anchoredPosition = originalPosition + new Vector2(0, currentOffset);
     }
 
     private float GetScaleFactor()
     {
-        // Для корректной работы в разных разрешениях
         Canvas canvas = GetComponentInParent<Canvas>();
         return canvas != null ? canvas.scaleFactor : 1f;
     }
@@ -144,9 +136,7 @@ public class DragAndScrollController : MonoBehaviour, IBeginDragHandler, IDragHa
         for (int i = 1; i <= level; i++)
         {
             if (i < levelOffsets.Count)
-            {
                 total += levelOffsets[i];
-            }
         }
         return total;
     }
@@ -166,7 +156,6 @@ public class DragAndScrollController : MonoBehaviour, IBeginDragHandler, IDragHa
                 closestLevel = i;
             }
         }
-
         return closestLevel;
     }
 
@@ -178,23 +167,5 @@ public class DragAndScrollController : MonoBehaviour, IBeginDragHandler, IDragHa
                 return i;
         }
         return 0;
-    }
-
-    // Для отладки (можно удалить)
-    void OnGUI()
-    {
-        if (GUI.Button(new Rect(10, 10, 150, 30), "Next Level"))
-        {
-            GoToNextLevel();
-        }
-
-        if (GUI.Button(new Rect(10, 50, 150, 30), "Reset"))
-        {
-            ResetToTop();
-        }
-
-        GUI.Label(new Rect(10, 90, 300, 30), $"Current Level: {currentLevel}");
-        GUI.Label(new Rect(10, 120, 300, 30), $"Max Level: {maxReachedLevel}");
-        GUI.Label(new Rect(10, 150, 300, 30), $"Current Offset: {currentOffset}");
     }
 }
