@@ -5,70 +5,60 @@ public class AvtoMovingController : MonoBehaviour
 {
     [Header("Movement Settings")]
     [SerializeField] private float speed = 0.3f;
-    [SerializeField] private GameObject prefabToMove;
+
+    [Header("Prefabs")]
+    [SerializeField] private List<GameObject> prefabsToMove;
+    [SerializeField] private int currentPrefabIndex = 0;
 
     [Header("Waypoints")]
     [SerializeField] private List<Transform> waypointsA;
     [SerializeField] private List<Transform> waypointsB;
 
     [Header("Rotation Settings")]
-    [SerializeField] private List<float> prefabRotations; // 🔹 Углы наклона для каждой пары точек
+    [SerializeField] private List<float> prefabRotations;
 
     [Header("Parent Reference")]
     [SerializeField] private Transform parentReference;
 
+    private GameObject activePrefab;
     private Vector3 localTargetPos;
     private int currentLevel = 0;
     private bool movingForward = true;
-    private SpriteRenderer spriteRenderer;
 
     [Header("Level Control")]
-    [SerializeField] private int numberLevel = 0; // 🔹 Максимальный разрешённый сегмент (0 = A0-B0)
+    [SerializeField] private int numberLevel = 0;
 
     private void Start()
     {
-        if (prefabToMove == null)
+        if (prefabsToMove == null || prefabsToMove.Count == 0)
         {
-            Debug.LogError("Prefab to move is not assigned!");
+            Debug.LogError("Prefabs list is empty!");
             return;
         }
 
-        if (parentReference == null)
-        {
-            Debug.LogError("Parent Reference is not assigned!");
-            return;
-        }
-
-        spriteRenderer = prefabToMove.GetComponent<SpriteRenderer>();
-        if (spriteRenderer == null)
-        {
-            Debug.LogError("Prefab doesn't have SpriteRenderer component!");
-        }
+        currentPrefabIndex = Mathf.Clamp(currentPrefabIndex, 0, prefabsToMove.Count - 1);
+        UpdateActivePrefab();
 
         if (prefabRotations.Count < waypointsA.Count)
-        {
-            Debug.LogWarning("Количество углов меньше количества уровней! Заполните список prefabRotations в инспекторе.");
-        }
+            Debug.LogWarning("Количество углов меньше количества уровней!");
 
-        // Начало движения
         SetTargetLocal(waypointsA[currentLevel].localPosition, waypointsB[currentLevel].localPosition, prefabRotations[currentLevel]);
     }
 
     private void Update()
     {
-        if (prefabToMove == null) return;
+        if (activePrefab == null) return;
 
         Vector3 worldTargetPos = parentReference.TransformPoint(localTargetPos);
-
-        prefabToMove.transform.position = Vector3.MoveTowards(
-            prefabToMove.transform.position,
+        activePrefab.transform.position = Vector3.MoveTowards(
+            activePrefab.transform.position,
             worldTargetPos,
             speed * Time.deltaTime
         );
 
-        if (Vector3.Distance(prefabToMove.transform.position, worldTargetPos) < 0.01f)
+        if (Vector3.Distance(activePrefab.transform.position, worldTargetPos) < 0.01f)
         {
-            spriteRenderer.flipX = !spriteRenderer.flipX;
+            FlipBranch();
             HandleWaypointReached();
         }
     }
@@ -77,27 +67,22 @@ public class AvtoMovingController : MonoBehaviour
     {
         if (movingForward)
         {
-            // 🚩 Мы на точке B
             if (localTargetPos == waypointsB[currentLevel].localPosition)
             {
-                if (currentLevel >= numberLevel) // Достигли максимального разрешённого сегмента
+                if (currentLevel >= numberLevel)
                 {
                     movingForward = false;
                     SetTargetLocal(waypointsB[currentLevel].localPosition, waypointsA[currentLevel].localPosition, prefabRotations[currentLevel]);
-                    return;
                 }
                 else
                 {
-                    // Переходим на следующий сегмент
                     currentLevel++;
                     SetTargetLocal(waypointsA[currentLevel].localPosition, waypointsB[currentLevel].localPosition, prefabRotations[currentLevel]);
-                    return;
                 }
             }
         }
         else
         {
-            // 🚩 Мы на точке A
             if (localTargetPos == waypointsA[currentLevel].localPosition)
             {
                 if (currentLevel > 0)
@@ -114,15 +99,91 @@ public class AvtoMovingController : MonoBehaviour
         }
     }
 
+    private void FlipBranch()
+    {
+        if (activePrefab == null) return;
+
+        Transform toA = activePrefab.transform.Find("ToA");
+        Transform toB = activePrefab.transform.Find("ToB");
+        if (toA == null || toB == null)
+        {
+            Debug.LogError("Active prefab должен содержать дочерние объекты 'ToA' и 'ToB'!");
+            return;
+        }
+
+        // Переключаем активность при достижении любой точки
+        bool isToAActive = toA.gameObject.activeSelf;
+        toA.gameObject.SetActive(!isToAActive);
+        toB.gameObject.SetActive(isToAActive);
+    }
+
+
     private void SetTargetLocal(Vector3 startLocalPos, Vector3 endLocalPos, float rotationZ)
     {
-        prefabToMove.transform.position = parentReference.TransformPoint(startLocalPos);
-        prefabToMove.transform.rotation = Quaternion.Euler(0, 0, rotationZ); // 🔹 Применяем угол
+        if (activePrefab == null) return;
+        activePrefab.transform.position = parentReference.TransformPoint(startLocalPos);
+        activePrefab.transform.rotation = Quaternion.Euler(0, 0, rotationZ);
         localTargetPos = endLocalPos;
     }
 
     public void SetLevel(int newLevel)
     {
         numberLevel = Mathf.Clamp(newLevel, 0, waypointsA.Count - 1);
+    }
+
+    public void SetCurrentPrefab(int index)
+    {
+        if (prefabsToMove == null || prefabsToMove.Count == 0) return;
+
+        index = Mathf.Clamp(index, 0, prefabsToMove.Count - 1);
+        if (index == currentPrefabIndex) return;
+
+        GameObject oldPrefab = activePrefab;
+        bool isToAActive = false;
+        float oldRotationZ = 0f;
+
+        if (oldPrefab != null)
+        {
+            Transform oldToA = oldPrefab.transform.Find("ToA");
+            Transform oldToB = oldPrefab.transform.Find("ToB");
+            if (oldToA != null && oldToB != null)
+                isToAActive = oldToA.gameObject.activeSelf;
+
+            // Сохраняем угол старого префаба
+            oldRotationZ = oldPrefab.transform.rotation.eulerAngles.z;
+
+            oldPrefab.SetActive(false);
+        }
+
+        currentPrefabIndex = index;
+        UpdateActivePrefab();
+
+        if (activePrefab != null)
+        {
+            // Сохраняем позицию старого префаба
+            Vector3 oldPos = oldPrefab != null ? oldPrefab.transform.position : parentReference.TransformPoint(waypointsA[currentLevel].localPosition);
+            activePrefab.transform.position = oldPos;
+
+            // Устанавливаем угол нового префаба с учётом старого
+            activePrefab.transform.rotation = Quaternion.Euler(0, 0, oldRotationZ);
+
+            Transform toA = activePrefab.transform.Find("ToA");
+            Transform toB = activePrefab.transform.Find("ToB");
+            if (toA != null && toB != null)
+            {
+                toA.gameObject.SetActive(isToAActive);
+                toB.gameObject.SetActive(!isToAActive);
+            }
+        }
+    }
+
+
+
+    private void UpdateActivePrefab()
+    {
+        if (prefabsToMove == null || prefabsToMove.Count == 0) return;
+
+        activePrefab = prefabsToMove[currentPrefabIndex];
+        if (activePrefab != null) activePrefab.SetActive(true);
     }
 }

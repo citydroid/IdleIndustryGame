@@ -44,7 +44,7 @@ public class MainScript : MonoBehaviour
             incrementText.text = "+ " + increment.Value.ToString();
     }
 
-    private string FormatCost(int cost)
+    private string FormatCost(long cost)
     {
         return string.Format(CultureInfo.InvariantCulture, "{0:#,##0}", cost).Replace(",", ".");
     }

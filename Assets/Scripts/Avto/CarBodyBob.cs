@@ -2,8 +2,8 @@ using UnityEngine;
 
 public class CarBodyBob : MonoBehaviour
 {
-    [SerializeField] private float bobAmplitude = 0.05f; // амплитуда покачивания
-    [SerializeField] private float bobFrequency = 2f;    // частота (кол-во колебаний в секунду)
+    [SerializeField] private float bobAmplitude = 0.02f; // амплитуда покачивания
+    [SerializeField] private float bobFrequency = 3f;    // частота (кол-во колебаний в секунду)
 
     private Vector3 startPos;
 

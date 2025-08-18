@@ -1,18 +1,23 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class AvtoActivator : MonoBehaviour, IButtonAction
 {
-    [Header("Объект, который нужно включить")]
-    [SerializeField] private GameObject objectToActivate;
+    [Header("Объект с AvtoMovingController")]
+    [SerializeField] private AvtoMovingController targetController;
+
+    [Header("Индекс префаба (начиная с 0)")]
+    [SerializeField] private int prefabIndex = 0;
 
     public void Execute()
     {
-        Debug.Log("AvtoActivator: Execute вызван");
+        Debug.Log($"PrefabAvtoActivator: Устанавливаем префаб с индексом {prefabIndex}");
 
-        if (objectToActivate == null)    return;
+        if (targetController == null)
+        {
+            Debug.LogWarning("PrefabAvtoActivator: targetController не назначен.");
+            return;
+        }
 
-        objectToActivate.SetActive(true);
+        targetController.SetCurrentPrefab(prefabIndex);
     }
 }

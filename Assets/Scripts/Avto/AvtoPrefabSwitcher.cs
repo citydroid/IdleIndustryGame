@@ -1,17 +1,14 @@
-using UnityEngine;
+п»їusing UnityEngine;
 
 public class AvtoPrefabSwitcher : MonoBehaviour
 {
-    [SerializeField] private GameObject[] levels; // Level0, Level1, Level2...
+    [SerializeField] private GameObject[] levels;
 
-    /// <summary>
-    /// Включает указанный уровень по индексу, выключая все остальные
-    /// </summary>
     public void ActivateLevel(int index)
     {
         if (levels == null || levels.Length == 0)
         {
-            Debug.LogWarning("LevelSwitcher: массив levels пуст.");
+            Debug.LogWarning("LevelSwitcher: РјР°СЃСЃРёРІ levels РїСѓСЃС‚.");
             return;
         }
 
@@ -22,8 +19,19 @@ public class AvtoPrefabSwitcher : MonoBehaviour
         }
     }
 
+    public GameObject GetActiveChild()
+    {
+        if (levels == null) return null;
+
+        foreach (var lvl in levels)
+        {
+            if (lvl != null && lvl.activeSelf)
+                return lvl;
+        }
+        return null;
+    }
+
 #if UNITY_EDITOR
-    // Чтобы автоматически заполнить массив дочерними объектами в редакторе
     private void OnValidate()
     {
         if (levels == null || levels.Length == 0)

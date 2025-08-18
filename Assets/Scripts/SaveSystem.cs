@@ -5,7 +5,7 @@ using UnityEngine;
 [System.Serializable]
 public class SaveData
 {
-    public int totalValue = 1000000;
+    public long totalValue = 10000000000;
     public int incrementValue = 0;
 
 }
@@ -90,6 +90,6 @@ public class SaveSystem : MonoBehaviour
         if (Increment != null) Increment.Value = _saveData.incrementValue;
     }
 
-    public int GetSavedTotalValue() => _saveData.totalValue;
+    public long GetSavedTotalValue() => _saveData.totalValue;
     public int GetSavedIncrementValue() => _saveData.incrementValue;
 }

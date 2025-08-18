@@ -121,7 +121,7 @@ public class UpgradeButton : MonoBehaviour
         }
         else if (_saveSystem != null)
         {
-            int newValue = _saveSystem.GetSavedTotalValue() - cost;
+            long newValue = _saveSystem.GetSavedTotalValue() - cost;
             _saveSystem.Result.TotalValue = newValue;
             _saveSystem.SaveGame();
         }

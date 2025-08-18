@@ -3,19 +3,19 @@ using UnityEngine;
 public class Result
 {
     private MainScript _mainScript;
-    private int _totalValue;
+    private long _totalValue;
     public SaveSystem _saveSystem;
-    public int TotalValue
+    public long TotalValue
     {
         get => _totalValue;
         set
         {
-            _totalValue = Mathf.Max(0, value);
+            _totalValue = System.Math.Max(0, value);
             _saveSystem?.SaveGame();
         }
     }
 
-    public Result(MainScript mainScript, int startValue)
+    public Result(MainScript mainScript, long startValue)
     {
         _mainScript = mainScript;
         _totalValue = startValue;

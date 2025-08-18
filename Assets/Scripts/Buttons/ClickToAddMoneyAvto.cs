@@ -7,7 +7,7 @@ using TMPro;
 public class ClickToAddMoneyAvto : MonoBehaviour
 {
     [Header("Main Settings")]
-    [SerializeField] private MainScript mainScript;
+    private MainScript mainScript;
     private int clickReward = 15;
     [SerializeField] private float clickScaleFactor = 0.9f;
     [SerializeField] private float animationDuration = 0.1f;
@@ -36,12 +36,32 @@ public class ClickToAddMoneyAvto : MonoBehaviour
         _originalScale = transform.localScale;
         _audioSource = GetComponent<AudioSource>();
 
-        if (mainScript == null)
-            mainScript = FindObjectOfType<MainScript>();
-
         if (_audioSource == null)
             _audioSource = gameObject.AddComponent<AudioSource>();
+
+        // Автоматическое присвоение mainScript
+        if (mainScript == null)
+        {
+            GameObject mainSystem = GameObject.Find("MainSystem");
+            if (mainSystem != null)
+            {
+                Transform mainScriptObj = mainSystem.transform.Find("MainScriptObj");
+                if (mainScriptObj != null)
+                {
+                    mainScript = mainScriptObj.GetComponent<MainScript>();
+                }
+                else
+                {
+                    Debug.LogWarning("MainScriptObj не найден в MainSystem!");
+                }
+            }
+            else
+            {
+                Debug.LogWarning("MainSystem не найден на сцене!");
+            }
+        }
     }
+
 
     private void OnMouseDown()
     {
