@@ -2,6 +2,7 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.Localization;
 using System.Globalization;
+using System;
 
 public class IncrementChanger : MonoBehaviour
 {
@@ -14,8 +15,9 @@ public class IncrementChanger : MonoBehaviour
         public int incrementCoefficient;
         public LocalizedString buttonName;
         public int level = 1;
-        public int cost;
-        public int costCoefficient;
+
+        public long cost;
+        public long costCoefficient;
     }
 
     [Header("Button Settings")]
@@ -29,7 +31,7 @@ public class IncrementChanger : MonoBehaviour
     private TextMeshPro nameText;
     private TextMeshPro levelText;
 
-    private int currentCost;
+    private long currentCost;
     private bool isPointerOver = false;
 
     public Color priceTextColor = new Color(0.67f, 0.67f, 0.67f); // #AAAAAA
@@ -113,7 +115,7 @@ public class IncrementChanger : MonoBehaviour
             mainScript.infoTextCondition.text = $"+{buttonData.incrementValue} в секунду";
     }
 
-    private string FormatCost(int cost)
+    private string FormatCost(long cost)
     {
         return string.Format(CultureInfo.InvariantCulture, "{0:#,##0}", cost).Replace(",", ".");
     }
@@ -172,7 +174,8 @@ public class IncrementChanger : MonoBehaviour
         CalculateCurrentCost();
         UpdateTexts();
     }
-    public int GetCurrentCost()
+
+    public long GetCurrentCost()
     {
         return currentCost;
     }
@@ -181,6 +184,7 @@ public class IncrementChanger : MonoBehaviour
     {
         buttonData.incrementValue += value;
     }
+
     public int GetIncrementValue()
     {
         return buttonData.incrementValue;
@@ -203,7 +207,7 @@ public class IncrementChanger : MonoBehaviour
         mainScript.increment.Value += buttonData.incrementValue;
 
         buttonData.cost += buttonData.costCoefficient;
-        buttonData.costCoefficient = Mathf.RoundToInt((buttonData.costCoefficient * 0.5f) + buttonData.costCoefficient);
+        buttonData.costCoefficient = (long)Math.Round(buttonData.costCoefficient * 1.5);
         buttonData.level++;
 
         UpdateLevelText();

@@ -188,7 +188,7 @@ public class UpgradeButton : MonoBehaviour
         switch (unlockCondition)
         {
             case UnlockConditionType.CostCheck:
-                int currentCost = changerToCheck?.GetCurrentCost() ?? 0;
+                long currentCost = changerToCheck?.GetCurrentCost() ?? 0;
                 return $"Требуется: стоимость ≥ {targetCostToUnlock} [{currentCost}/{targetCostToUnlock}]";
 
             case UnlockConditionType.ExternalTrigger:

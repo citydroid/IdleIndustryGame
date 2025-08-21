@@ -9,6 +9,7 @@ public class MainScript : MonoBehaviour
     public TextMeshPro incrementText;
     public TextMeshPro infoTextName;
     public TextMeshPro infoTextCost;
+    public TextMeshPro infoTextAdvantages;
     public TextMeshPro infoTextCondition;
 
     public Increment increment;
@@ -36,12 +37,13 @@ public class MainScript : MonoBehaviour
     private void UpdateUI()
     {
         string formattedResult = FormatCost(result.TotalValue);
+        string formattedIncrement = FormatCost(increment.Value);
 
         if (resultText != null)
             resultText.text = formattedResult;
 
         if (incrementText != null)
-            incrementText.text = "+ " + increment.Value.ToString();
+            incrementText.text = formattedIncrement;
     }
 
     private string FormatCost(long cost)
