@@ -29,6 +29,10 @@ MonoBehaviour:
     m_Address: Assets/Resources/UpgradeButCondition Shared Data.asset
     m_ReadOnly: 1
     m_SerializedLabels: []
+  - m_GUID: b77afae198304a44ab675e763d438beb
+    m_Address: Assets/Resources/UI Shared Data.asset
+    m_ReadOnly: 1
+    m_SerializedLabels: []
   m_ReadOnly: 1
   m_Settings: {fileID: 11400000, guid: 30cd0d03ad923bc468e481da1657a35e, type: 2}
   m_SchemaSet:

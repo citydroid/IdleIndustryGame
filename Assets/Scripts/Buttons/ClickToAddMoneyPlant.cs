@@ -113,4 +113,10 @@ public class ClickToAddMoneyPlant : MonoBehaviour
 
         _isAnimating = false;
     }
+
+    public void PlayClickEffectOnly()
+    {
+        ShowFloatingText();
+        PlayClickParticles();
+    }
 }

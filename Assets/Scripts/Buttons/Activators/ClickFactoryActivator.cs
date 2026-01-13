@@ -19,17 +19,20 @@ public class ClickFactoryActivator : MonoBehaviour, IButtonAction
             return;
         }
 
-        foreach (var plant in targetPlants)
+        for (int i = 0; i < targetPlants.Count; i++)
         {
+            var plant = targetPlants[i];
+
             if (plant != null)
             {
                 plant.SetClickReward(newClickReward);
-                Debug.Log($"ClickRewardSetter: clickReward установлен в {newClickReward} дл€ {plant.name}");
-            }
-            else
-            {
-                Debug.LogWarning("ClickRewardSetter: ќдин из элементов списка targetPlants Ч null.");
+
+                if (i == 0)
+                {
+                    plant.PlayClickEffectOnly();
+                }
             }
         }
     }
+
 }

@@ -5,7 +5,7 @@ using UnityEngine;
 [System.Serializable]
 public class SaveData
 {
-    public long totalValue = 10000000000;
+    public long totalValue = 0;
     public int incrementValue = 0;
 
 }

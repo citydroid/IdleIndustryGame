@@ -1,9 +1,11 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Localization;
 
 [RequireComponent(typeof(SpriteRenderer))]
 [RequireComponent(typeof(Collider2D))]
 [RequireComponent(typeof(UpgradeButton))]
+[RequireComponent(typeof(AudioSource))]
 public class UpgradeButtonUI : MonoBehaviour,
     IPointerDownHandler, IPointerUpHandler,
     IPointerEnterHandler, IPointerExitHandler
@@ -18,6 +20,11 @@ public class UpgradeButtonUI : MonoBehaviour,
     public Color hoverColor = Color.gray;
     public Color disabledColor = Color.black;
 
+    [Header("Audio")]
+    [SerializeField] private AudioClip clickSound;
+    [SerializeField, Range(0f, 1f)] private float soundVolume = 0.5f;
+    private AudioSource audioSource;
+
     private SpriteRenderer spriteRenderer;
     private UpgradeButton logic;
     private bool isPointerOver;
@@ -30,7 +37,15 @@ public class UpgradeButtonUI : MonoBehaviour,
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
         logic = GetComponent<UpgradeButton>();
+        audioSource = GetComponent<AudioSource>();
         originalScale = transform.localScale;
+
+        audioSource.playOnAwake = false;
+        audioSource.volume = soundVolume;
+        if (clickSound != null)
+        {
+            audioSource.clip = clickSound;
+        }
     }
 
     private void Start()
@@ -87,6 +102,10 @@ public class UpgradeButtonUI : MonoBehaviour,
         if (logic.CanPurchase)
         {
             logic.TryPurchase();
+            if (clickSound != null)
+            {
+                audioSource.Play();
+            }
         }
         else
         {
@@ -121,38 +140,49 @@ public class UpgradeButtonUI : MonoBehaviour,
     {
         if (logic.Main == null) return;
 
-        // Всегда показываем название
         if (logic.Main.infoTextName != null)
         {
-            logic.Main.infoTextName.text = $"{logic.GetLocalizedButtonName()}";
+            logic.Main.infoTextName.text = $"<color=yellow>{logic.GetLocalizedButtonName()}</color>";
         }
 
-        // Всегда показываем цену
         if (logic.Main.infoTextCost != null)
         {
-            logic.Main.infoTextCost.text = $"<color=yellow>Цена:</color> <color=white>{logic.FormatCost()}</color>";
+            string priceLabelColor = logic.IsAffordable ? "#00FF00" : "#FF0000";
+
+            logic.Main.infoTextCost.text =
+                $"<color={priceLabelColor}>{TextStandart.GetPriceLabel()}</color> <color=white>{logic.FormatCost()}</color>";
         }
 
         // Условия разблокировки
         if (logic.Main.infoTextCondition != null)
         {
             logic.ForceCheckConditions();
-            string conditionText = logic.GetUnlockConditionText();
+           // string conditionText = logic.GetUnlockConditionText();
+
+            string conditionTextColor = logic.IsUnlocked ? "#00FF00" : "#FF0000";
 
             // Если есть кастомный текст условия, используем его
-            if (!string.IsNullOrEmpty(logic.conditionText.GetLocalizedString()))
+ /*            if (!string.IsNullOrEmpty(logic.conditionText.GetLocalizedString()))
             {
-                conditionText = logic.conditionText.GetLocalizedString();
+                conditionText = $"{TextStandart.GetRequiresLabel()} {logic.conditionText.GetLocalizedString()}";
             }
-            // Иначе проверяем стандартные условия
-            else if (logic.requireOtherButtonActivation &&
-                    logic.requiredButton != null &&
-                    !logic.requiredButton.purchased)
+           else if (logic.requireOtherButtonActivation &&
+                     logic.requiredButton != null &&
+                     !logic.requiredButton.purchased)
             {
-                conditionText = $"Требуется: {logic.requiredButton.GetLocalizedButtonName()}";
+                conditionText = $"{TextStandart.GetRequiresLabel()} {logic.requiredButton.GetLocalizedButtonName()}";
+                conditionTextColor = "#FF0000";
             }
-
-            logic.Main.infoTextCondition.text = $"{conditionText}";
+            else if (!logic.IsUnlocked)
+            {
+                conditionTextColor = "#FF0000";
+            }
+            else
+            {
+                conditionTextColor = "#00FF00";
+            }*/
+            Debug.Log($"GetRequiresLabel() = '{TextStandart.GetRequiresLabel()}'");
+            logic.Main.infoTextCondition.text = $"<color={conditionTextColor}>{TextStandart.GetRequiresLabel()}</color> <color=white>{logic.conditionText.GetLocalizedString()}</color>";
         }
     }
 
@@ -168,5 +198,13 @@ public class UpgradeButtonUI : MonoBehaviour,
 
         if (logic.Main.infoTextCondition != null)
             logic.Main.infoTextCondition.text = "";
+    }
+
+    private void OnValidate()
+    {
+        if (audioSource != null)
+        {
+            audioSource.volume = soundVolume;
+        }
     }
 }

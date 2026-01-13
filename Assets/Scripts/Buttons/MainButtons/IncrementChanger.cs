@@ -24,7 +24,7 @@ public class IncrementChanger : MonoBehaviour
     [SerializeField] private ButtonData buttonData;
     [SerializeField] public int buttonIndex;
 
-    private IncrementButton incrementButton;
+    private IncrementButtonUI incrementButton;
     private SpriteRenderer spriteRenderer;
     private TextMeshPro incrementText;
     private TextMeshPro costText;
@@ -34,14 +34,11 @@ public class IncrementChanger : MonoBehaviour
     private long currentCost;
     private bool isPointerOver = false;
 
-    public Color priceTextColor = new Color(0.67f, 0.67f, 0.67f); // #AAAAAA
-    public Color priceValueColor = Color.white;
-    public Color nameTextColor = Color.yellow;
 
     private void Awake()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
-        incrementButton = GetComponent<IncrementButton>();
+        incrementButton = GetComponent<IncrementButtonUI>();
 
         TextMeshPro[] texts = GetComponentsInChildren<TextMeshPro>();
         foreach (TextMeshPro text in texts)
@@ -100,19 +97,25 @@ public class IncrementChanger : MonoBehaviour
     {
         if (mainScript == null) return;
 
+        // Name text (Level Up for next level)
         if (mainScript.infoTextName != null)
-            mainScript.infoTextName.text = $"<color=#{ColorUtility.ToHtmlStringRGB(nameTextColor)}>{buttonData.buttonName.GetLocalizedString()} {buttonData.level + 1}</color>";
+            mainScript.infoTextName.text = $"<color=yellow>{buttonData.buttonName.GetLocalizedString()} {buttonData.level + 1}</color>";
 
+        // Cost text
         if (mainScript.infoTextCost != null)
         {
+            // Determine the color based on affordability
+            string priceLabelColor = CanAfford() ? "#00FF00" : "#FF0000"; // Green for affordable, Red for not
+
             string formattedCost = FormatCost(currentCost);
             mainScript.infoTextCost.text =
-                $"<color=#{ColorUtility.ToHtmlStringRGB(priceTextColor)}>Цена:</color> " +
-                $"<color=#{ColorUtility.ToHtmlStringRGB(priceValueColor)}>{formattedCost}</color>";
+                $"<color={priceLabelColor}>{TextStandart.GetPriceLabel()}</color> " + // Apply color to "Цена" (Price)
+                $"<color=white>{formattedCost}</color>";
         }
 
+        // Condition text
         if (mainScript.infoTextCondition != null)
-            mainScript.infoTextCondition.text = $"+{buttonData.incrementValue} в секунду";
+            mainScript.infoTextCondition.text = $"+{FormatCost(buttonData.incrementValue)} {TextStandart.GetPerSecondLabel()}"; 
     }
 
     private string FormatCost(long cost)

@@ -153,6 +153,7 @@ public class AvtoMovingController : MonoBehaviour
             oldRotationZ = oldPrefab.transform.rotation.eulerAngles.z;
 
             oldPrefab.SetActive(false);
+
         }
 
         currentPrefabIndex = index;
@@ -177,7 +178,10 @@ public class AvtoMovingController : MonoBehaviour
         }
     }
 
-
+    public void SetSpeed(float newSpeed)
+    {
+        speed = newSpeed;
+    }
 
     private void UpdateActivePrefab()
     {

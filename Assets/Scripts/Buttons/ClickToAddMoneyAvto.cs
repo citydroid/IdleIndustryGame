@@ -133,4 +133,9 @@ public class ClickToAddMoneyAvto : MonoBehaviour
 
         _isAnimating = false;
     }
+    public void PlayClickEffectOnly()
+    {
+        ShowFloatingText();
+        PlayClickParticles();
+    }
 }

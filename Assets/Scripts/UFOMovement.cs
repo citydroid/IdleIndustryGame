@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+[RequireComponent(typeof(AudioSource))]
 public class UFOMovement : MonoBehaviour
 {
     [Header("Prefab & Points")]
@@ -14,6 +15,11 @@ public class UFOMovement : MonoBehaviour
     [SerializeField] private float wobbleHeight = 0.2f;
     [SerializeField] private float wobbleSpeed = 5f;
     [SerializeField] private float respawnDelay = 20f;
+
+    [Header("Sound Effects")]
+    [SerializeField] private AudioClip destroySound; 
+    [SerializeField, Range(0f, 1f)] private float soundVolume = 0.5f; 
+    private AudioSource audioSource;
 
     [Header("Tilt Settings")]
     [SerializeField] private float maxTiltAngle = 15f;
@@ -34,6 +40,14 @@ public class UFOMovement : MonoBehaviour
         mainScript = FindObjectOfType<MainScript>();
         if (mainScript == null)
             Debug.LogWarning("MainScript not found in scene.");
+
+        audioSource = GetComponent<AudioSource>();
+        audioSource.playOnAwake = false;
+        audioSource.volume = soundVolume; 
+        if (destroySound != null)
+        {
+            audioSource.clip = destroySound;
+        }
 
         StartCoroutine(UFOSpawnLoop());
     }
@@ -69,6 +83,8 @@ public class UFOMovement : MonoBehaviour
         {
             clickHandler.Init(this, mainScript);
         }
+
+        audioSource.Play();
     }
 
     private void Update()
@@ -120,6 +136,11 @@ public class UFOMovement : MonoBehaviour
     }
     public void DestroyUFO(GameObject ufo)
     {
+        if (audioSource.isPlaying)
+        {
+            audioSource.Stop();
+        }
+
         if (ufo != null)
         {
             Destroy(ufo);

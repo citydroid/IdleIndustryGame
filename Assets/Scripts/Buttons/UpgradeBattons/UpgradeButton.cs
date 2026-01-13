@@ -21,7 +21,7 @@ public class UpgradeButton : MonoBehaviour
 
     [Header("Upgrade Settings")]
     [SerializeField] private ButtonData buttonData;
-    [SerializeField] private int cost;
+    [SerializeField] private long cost;
     [SerializeField] private IncrementChanger targetChanger;
 
     [Header("Unlock Settings")]
@@ -64,7 +64,7 @@ public class UpgradeButton : MonoBehaviour
     public bool CanPurchase => IsAffordable && conditionsMet && !purchased;
 
     public MainScript Main => mainScript;
-    public int Cost => cost;
+    public long Cost => cost;
     public string RawButtonName => gameObject.name;
 
     private void Awake()

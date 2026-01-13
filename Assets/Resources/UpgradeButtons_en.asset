@@ -19,23 +19,143 @@ MonoBehaviour:
     m_Items: []
   m_TableData:
   - m_Id: 34980478976
-    m_Localized: Upgrade Factory 1
+    m_Localized: FACTORY BOOST 1
     m_Metadata:
       m_Items: []
   - m_Id: 427168874496
-    m_Localized: Upgrade Factory 2
+    m_Localized: FACTORY BOOST 2
     m_Metadata:
       m_Items: []
   - m_Id: 459414683648
-    m_Localized: Upgrade Factory 3
+    m_Localized: FACTORY BOOST 3
     m_Metadata:
       m_Items: []
   - m_Id: 517728092160
-    m_Localized: Upgrade Factory 4
+    m_Localized: FACTORY BOOST 4
     m_Metadata:
       m_Items: []
   - m_Id: 556756090880
-    m_Localized: Upgrade Factory 5
+    m_Localized: FACTORY BOOST 5
+    m_Metadata:
+      m_Items: []
+  - m_Id: 15974965251764224
+    m_Localized: CAR BOOST 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 15975122798211072
+    m_Localized: CAR BOOST 2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 15975139810308096
+    m_Localized: CAR BOOST 3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 15975155648000000
+    m_Localized: CAR BOOST 4
+    m_Metadata:
+      m_Items: []
+  - m_Id: 15975204905906176
+    m_Localized: CAR BOOST 5
+    m_Metadata:
+      m_Items: []
+  - m_Id: 15975364826329088
+    m_Localized: BUILDING BOOST 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 15975393246932992
+    m_Localized: BUILDING BOOST 2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 15975401232887808
+    m_Localized: BUILDING BOOST 3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 15975408614862848
+    m_Localized: BUILDING BOOST 4
+    m_Metadata:
+      m_Items: []
+  - m_Id: 15975414923096064
+    m_Localized: BUILDING BOOST 5
+    m_Metadata:
+      m_Items: []
+  - m_Id: 15987040590065664
+    m_Localized: STAGE BOOST 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 15987436901462016
+    m_Localized: STAGE BOOST 2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 15987444618981376
+    m_Localized: STAGE BOOST 3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 15987480153124864
+    m_Localized: STAGE BOOST 4
+    m_Metadata:
+      m_Items: []
+  - m_Id: 15987497031004160
+    m_Localized: STAGE BOOST 5
+    m_Metadata:
+      m_Items: []
+  - m_Id: 15987666917093376
+    m_Localized: NUMBER BOOST 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 15987708860133376
+    m_Localized: NUMBER BOOST 2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 15987721610817536
+    m_Localized: NUMBER BOOST 3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 15987755668566016
+    m_Localized: NUMBER BOOST 5
+    m_Metadata:
+      m_Items: []
+  - m_Id: 15987733455532032
+    m_Localized: NUMBER BOOST 4
+    m_Metadata:
+      m_Items: []
+  - m_Id: 15988795721740288
+    m_Localized: TYPE BOOST 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 15988825182531584
+    m_Localized: TYPE BOOST 2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 15988836054167552
+    m_Localized: TYPE BOOST 3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 15988885412737024
+    m_Localized: TYPE BOOST 4
+    m_Metadata:
+      m_Items: []
+  - m_Id: 15988905344069632
+    m_Localized: TYPE BOOST 5
+    m_Metadata:
+      m_Items: []
+  - m_Id: 15989648071421952
+    m_Localized: SPEED BOOST 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 15989680854102016
+    m_Localized: SPEED BOOST 2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 15989692300357632
+    m_Localized: SPEED BOOST 3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 15989705990565888
+    m_Localized: SPEED BOOST 4
+    m_Metadata:
+      m_Items: []
+  - m_Id: 15989717264855040
+    m_Localized: SPEED BOOST 5
     m_Metadata:
       m_Items: []
   references:

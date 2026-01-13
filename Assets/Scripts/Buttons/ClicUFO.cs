@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
+[RequireComponent(typeof(AudioSource))]
 public class ClicUFO : MonoBehaviour
 {
     private MainScript mainScript;
@@ -8,13 +9,15 @@ public class ClicUFO : MonoBehaviour
 
     [Header("Префаб всплывающего текста 'x2'")]
     [SerializeField] private GameObject scalingFadeTextPrefab;
+    [Header("Задержка перед появлением текста (секунды)")]
+    [SerializeField] private float textSpawnDelay = 0.5f;
 
     [Header("Позиция для появления текста")]
     [SerializeField] private Transform textSpawnPoint;
 
     [Header("Sound Effects")]
     [SerializeField] private AudioClip clickSound;
-    [SerializeField] private float soundVolume = 0.5f;
+    [SerializeField] private float soundVolume = 2f;
     private AudioSource _audioSource;
 
     [Header("Анимация при уничтожении UFO")]
@@ -24,6 +27,17 @@ public class ClicUFO : MonoBehaviour
     {
         this.manager = manager;
         this.mainScript = mainScript;
+    }
+
+    private void Awake()
+    {
+        _audioSource = GetComponent<AudioSource>();
+        _audioSource.playOnAwake = false;
+        _audioSource.volume = soundVolume; 
+        if (clickSound != null)
+        {
+            _audioSource.clip = clickSound;
+        }
     }
 
     public void Execute()
@@ -50,11 +64,12 @@ public class ClicUFO : MonoBehaviour
             }
         }
 
-        // Инициализация AudioSource
-        if (_audioSource == null)
-            _audioSource = gameObject.AddComponent<AudioSource>();
+        if (clickSound != null)
+        {
+            AudioSource.PlayClipAtPoint(clickSound, transform.position, soundVolume);
+        }
 
-        PlayClickSound();
+        //StartCoroutine(SpawnTextWithDelay());
 
         // Создание и управление анимацией
         if (animationPrefab != null)
@@ -79,11 +94,32 @@ public class ClicUFO : MonoBehaviour
             manager.DestroyUFO(gameObject);
         }
     }
-
-    private void PlayClickSound()
+    private IEnumerator SpawnTextWithDelay()
     {
-        _audioSource.volume = soundVolume;
-        _audioSource.PlayOneShot(clickSound);
+        yield return new WaitForSeconds(textSpawnDelay);
+
+        if (scalingFadeTextPrefab != null)
+        {
+            Vector3 spawnPos = textSpawnPoint != null ? textSpawnPoint.position : transform.position;
+            GameObject obj = Instantiate(scalingFadeTextPrefab, spawnPos, Quaternion.identity);
+
+            var scalingText = obj.GetComponent<ScalingFadeText>();
+            if (scalingText != null)
+            {
+                scalingText.Initialize("x2", Color.yellow);
+            }
+            else
+            {
+                Debug.LogWarning("ClicUFOActivator: В префабе нет ScalingFadeText компонента");
+            }
+        }
+    }
+    private void OnValidate()
+    {
+        if (_audioSource != null)
+        {
+            _audioSource.volume = soundVolume; 
+        }
     }
 
     private void OnMouseDown()

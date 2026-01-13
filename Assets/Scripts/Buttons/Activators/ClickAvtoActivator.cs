@@ -19,16 +19,18 @@ public class ClickAvtoActivator : MonoBehaviour, IButtonAction
             return;
         }
 
-        foreach (var plant in targetAvto)
+        for (int i = 0; i < targetAvto.Count; i++)
         {
+            var plant = targetAvto[i];
+
             if (plant != null)
             {
                 plant.SetClickReward(newClickReward);
-                Debug.Log($"ClickRewardSetter: clickReward установлен в {newClickReward} дл€ {plant.name}");
-            }
-            else
-            {
-                Debug.LogWarning("ClickRewardSetter: ќдин из элементов списка targetPlants Ч null.");
+
+                if (i < 6)
+                {
+                    plant.PlayClickEffectOnly();
+                }
             }
         }
     }

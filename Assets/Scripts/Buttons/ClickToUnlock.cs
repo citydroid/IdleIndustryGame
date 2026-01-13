@@ -3,9 +3,9 @@ using UnityEngine;
 [RequireComponent(typeof(Collider2D))]
 public class ClickToUnlock : MonoBehaviour
 {
-    [SerializeField] private UpgradeButton[] targetButtons; // Массив кнопок, которые нужно разблокировать
-    [SerializeField] private float clickScaleFactor = 0.9f; // Насколько уменьшается объект при клике
-    [SerializeField] private float animationDuration = 0.1f; // Длительность анимации
+    [SerializeField] private UpgradeButton[] targetButtons; 
+    [SerializeField] private float clickScaleFactor = 0.9f; 
+    [SerializeField] private float animationDuration = 0.1f; 
 
     private Vector3 _originalScale;
     private bool _isAnimating = false;

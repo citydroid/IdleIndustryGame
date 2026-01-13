@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using System.Collections.Generic;
 
-public class DragAndScrollController : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
+public class DragAndScrollController : MonoBehaviour
 {
     [Header("Настройки скроллинга")]
     [SerializeField] public List<float> levelOffsets = new List<float> { 0f, 50f, 80f, 120f };
@@ -72,50 +72,6 @@ public class DragAndScrollController : MonoBehaviour, IBeginDragHandler, IDragHa
     public int GetCurrentLevel() => currentLevel;
     public int GetMaxReachedLevel() => maxReachedLevel;
 
-    // === Drag events ===
-    public void OnBeginDrag(PointerEventData eventData)
-    {
-        if (eventData.button != PointerEventData.InputButton.Left) return;
-        isDragging = true;
-        dragStartPosition = eventData.position;
-        dragStartOffset = currentOffset;
-    }
-
-    public void OnDrag(PointerEventData eventData)
-    {
-        if (!isDragging || eventData.button != PointerEventData.InputButton.Left) return;
-
-        float dragDelta = (eventData.position.y - dragStartPosition.y) / GetScaleFactor();
-        float newOffset = dragStartOffset + dragDelta;
-
-        float maxOffset = GetTotalOffsetForLevel(maxReachedLevel);
-        newOffset = Mathf.Clamp(newOffset, 0f, maxOffset);
-
-        currentOffset = newOffset;
-        UpdatePosition();
-    }
-
-    public void OnEndDrag(PointerEventData eventData)
-    {
-        if (eventData.button != PointerEventData.InputButton.Left) return;
-        isDragging = false;
-
-        int closestLevel = FindClosestLevel(currentOffset);
-        closestLevel = Mathf.Clamp(closestLevel, 0, maxReachedLevel);
-
-        if (Mathf.Abs(currentOffset - GetTotalOffsetForLevel(closestLevel)) <= snapThreshold)
-        {
-            currentLevel = closestLevel;
-            targetOffset = GetTotalOffsetForLevel(currentLevel);
-        }
-        else
-        {
-            currentLevel = FindCurrentLevel(currentOffset);
-            targetOffset = Mathf.Clamp(currentOffset, 0f, GetTotalOffsetForLevel(maxReachedLevel));
-        }
-    }
-
-    // === Helpers ===
     private void UpdatePosition()
     {
         rectTransform.anchoredPosition = originalPosition + new Vector2(0, currentOffset);

@@ -48,6 +48,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   textObjectName: TextObj
   coinObjectName: Coin
+  coinObjectName2: Coin2
+  useSecondCoin: 0
 --- !u!1 &4034344749689889445
 GameObject:
   m_ObjectHideFlags: 0

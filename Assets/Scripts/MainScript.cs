@@ -43,7 +43,7 @@ public class MainScript : MonoBehaviour
             resultText.text = formattedResult;
 
         if (incrementText != null)
-            incrementText.text = formattedIncrement;
+            incrementText.text = $"+{formattedIncrement}";
     }
 
     private string FormatCost(long cost)
